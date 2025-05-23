@@ -5,7 +5,7 @@
 // Constants for ant behavior and simulation parameters
 namespace
 {
-    constexpr auto COLONY_SIZE = 0.05f;
+    constexpr auto COLONY_SIZE = 0.5f;
     constexpr auto ANT_SIZE = 0.05f;
 }
 

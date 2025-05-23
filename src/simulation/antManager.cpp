@@ -1,4 +1,7 @@
+#include "../core/logger.hpp"
 #include "../utils/viewPort.hpp"
+#include "../utils/consoleLogger.hpp"
+
 #include "antManager.hpp"
 
 #include <algorithm>
@@ -6,6 +9,7 @@
 #include <iostream>
 #include <random>
 #include <vector>
+#include <memory>
 
 // Constants for ant behavior and simulation parameters
 namespace
@@ -20,7 +24,8 @@ namespace
     constexpr auto MAX_POSITION_ATTEMPTS = 10;
 }
 
-AntManager::AntManager() {}
+AntManager::AntManager() : AntManager(std::make_shared<AntColony::Utils::ConsoleLogger>()) {}
+AntManager::AntManager(std::shared_ptr<AntColony::Core::Logger> logger) : logger(logger) {}
 
 void AntManager::spawnAnts(const Colony &colony, const float antSize)
 {
@@ -28,8 +33,13 @@ void AntManager::spawnAnts(const Colony &colony, const float antSize)
     if (!ants.empty())
         return;
 
+    logger->debug("Spawning ants in colony");
+
     const auto colonyPosition = colony.getPosition();
     const auto colonySize = colony.getSize();
+
+    logger->debug("Colony size: " + std::to_string(colonySize));
+    logger->debug("Ant size: " + std::to_string(antSize));
 
     // Generate possible spawn positions using a hexagonal grid
     const auto &positions = generateHexGrid(colonyPosition, colonySize, antSize);
@@ -37,11 +47,14 @@ void AntManager::spawnAnts(const Colony &colony, const float antSize)
     // Calculate number of ants based on colony size
     const auto numAnts = static_cast<int>(std::floor(colonySize / antSize));
 
+    logger->debug("Placing " + std::to_string(numAnts) + " ant(s) in colony space");
+
     // Validate we have enough positions for all ants
     if (positions.size() < numAnts)
     {
-        std::cerr << "Error: Not enough positions to spawn all ants! "
-                  << "Available: " << positions.size() << ", Required: " << numAnts << std::endl;
+        logger->error("Not enough positions to spawn all ants! Available: " +
+                      std::to_string(positions.size()) + ", Required: " +
+                      std::to_string(numAnts));
         return;
     }
 

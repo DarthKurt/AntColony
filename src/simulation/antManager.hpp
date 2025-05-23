@@ -1,9 +1,13 @@
 #pragma once
 
-#include <vector>
 #include "ant.hpp"
 #include "colony.hpp"
 #include "food.hpp"
+
+#include "../core/logger.hpp"
+
+#include <vector>
+#include <memory>
 
 /**
  * @class AntManager
@@ -20,6 +24,11 @@ public:
      * @brief Default constructor
      */
     AntManager();
+
+    /**
+     * @brief Constructor with custom logger
+     */
+    explicit AntManager(std::shared_ptr<AntColony::Core::Logger> logger);
 
     /**
      * @brief Spawns ants at the provided colony
@@ -42,8 +51,15 @@ public:
     void render(GLFWwindow *window) const;
 
 private:
-    /** Stores all ants in the simulation */
+    /**
+     * @brief Stores all ants in the simulation
+     */
     std::vector<Ant> ants;
+
+    /**
+     * @brief Stores logger utility
+     */
+    std::shared_ptr<AntColony::Core::Logger> logger;
 
     /**
      * @brief Generates a grid of hexagonal cells inside a circle
