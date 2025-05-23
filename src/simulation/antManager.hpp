@@ -48,9 +48,9 @@ namespace AntColony::Simulation
 
         /**
          * @brief Renders all ants to the window
-         * @param window The GLFW window to render to
+         * @param renderer The renderer to be used
          */
-        void render(GLFWwindow *window) const;
+        void render(const Render::Renderer &renderer) const;
 
     private:
         /**

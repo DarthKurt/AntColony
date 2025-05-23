@@ -12,6 +12,6 @@ namespace AntColony::Render
         virtual void init() = 0;
         virtual bool getInited() const = 0;
         virtual bool shouldClose() const = 0;
-        virtual std::unique_ptr<FrameContext> getFrameContext() = 0;
+        virtual std::unique_ptr<FrameContext> getFrameContext() const = 0;
     };
 }

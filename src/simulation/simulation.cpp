@@ -23,14 +23,12 @@ namespace AntColony::Simulation
         foodManager.update();
     }
 
-    void Simulation::render(Render::FrameContext &ctx) const
+    void Simulation::render(const Render::FrameContext &ctx) const
     {
-        // TODO: get rid of GLFWFrameContext
-        auto &glfwFrameContext = static_cast<Render::GLFW::GLFWFrameContext &>(ctx);
-        auto *window = glfwFrameContext.getWindow();
+        auto &render = ctx.getRenderer();
 
-        colony.render(window);
-        antManager.render(window);
-        foodManager.render(window);
+        colony.render(render);
+        antManager.render(render);
+        foodManager.render(render);
     }
 }

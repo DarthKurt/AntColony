@@ -60,10 +60,10 @@ namespace AntColony::Simulation
         removeDepletedFood();
     }
 
-    void FoodManager::render(GLFWwindow *window) const
+    void FoodManager::render(const Render::Renderer &renderer) const
     {
         for (const Food &food : foodParticles)
-            food.render(window);
+            food.render(renderer);
     }
 
     std::vector<Food> &FoodManager::getFoodParticles()

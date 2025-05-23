@@ -4,9 +4,6 @@
 #include "food.hpp"
 #include "../core/point.hpp"
 
-#include <GLFW/glfw3.h>
-#include <vector>
-
 namespace AntColony::Simulation
 {
     class Ant : public Entity, public BaseEntity
@@ -15,7 +12,7 @@ namespace AntColony::Simulation
         Ant(Core::Point position, float size);
         Ant(Core::Point position, Core::Point velocity, float size);
 
-        void render(GLFWwindow *window) const override;
+        void render(const Render::Renderer &renderer) const override;
 
         void biteFood(Food &food);
         void dropFood();

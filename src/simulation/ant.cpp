@@ -21,16 +21,16 @@ namespace AntColony::Simulation
         carryFood = false;
     }
 
-    void Ant::render(GLFWwindow *window) const
+    void Ant::render(const Render::Renderer &renderer) const
     {
         if (carryFood)
         {
-            drawCircleInPosition(mainColor, entitySize, window);
-            drawCircleInPosition(0xadf542, entitySize / 2, window);
+            renderer.drawCircleInPosition(position, entitySize, Core::Color(mainColor));
+            renderer.drawCircleInPosition(position, entitySize / 2, Core::Color(0xadf542));
         }
         else
         {
-            drawCircleInPosition(mainColor, entitySize, window);
+            renderer.drawCircleInPosition(position, entitySize, Core::Color(mainColor));
         }
     }
 

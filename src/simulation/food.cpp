@@ -1,6 +1,8 @@
 #include "food.hpp"
 #include "baseEntity.hpp"
+
 #include "../core/point.hpp"
+#include "../core/color.hpp"
 
 namespace AntColony::Simulation
 {
@@ -15,9 +17,9 @@ namespace AntColony::Simulation
         }
     }
 
-    void Food::render(GLFWwindow *window) const
+    void Food::render(const Render::Renderer &renderer) const
     {
-        drawCircleInPosition(mainColor, entitySize, window);
+        renderer.drawCircleInPosition(position, entitySize, Core::Color(mainColor));
     }
 
     Core::Point Food::getPosition() const { return position; }

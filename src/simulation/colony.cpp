@@ -12,9 +12,9 @@ namespace AntColony::Simulation
     Colony::Colony(Core::Point position, float size, unsigned int hexColor)
         : BaseEntity(position, hexColor, size) {}
 
-    void Colony::render(GLFWwindow *window) const
+    void Colony::render(const Render::Renderer &renderer) const
     {
-        drawCircleInPosition(mainColor, entitySize, window);
+        renderer.drawCircleInPosition(position, entitySize, Core::Color(mainColor));
     }
 
     Core::Point Colony::getPosition() const { return position; }

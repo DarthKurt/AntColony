@@ -7,7 +7,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <iostream>
 #include <vector>
 #include <memory>
 
@@ -348,9 +347,9 @@ namespace AntColony::Simulation
         }
     }
 
-    void AntManager::render(GLFWwindow *window) const
+    void AntManager::render(const Render::Renderer &renderer) const
     {
         for (const auto &ant : ants)
-            ant.render(window);
+            ant.render(renderer);
     }
 }

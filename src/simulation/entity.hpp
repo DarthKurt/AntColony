@@ -1,8 +1,7 @@
 #pragma once
 
 #include "../core/point.hpp"
-
-#include <GLFW/glfw3.h>
+#include "../render/renderer.hpp"
 
 namespace AntColony::Simulation
 {
@@ -12,7 +11,7 @@ namespace AntColony::Simulation
         /**
          * @brief Method for rendering the entity
          */
-        virtual void render(GLFWwindow *window) const = 0;
+        virtual void render(const Render::Renderer &renderer) const = 0;
 
         virtual Core::Point getPosition() const = 0;
         virtual float getSize() const = 0;

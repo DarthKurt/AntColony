@@ -1,12 +1,15 @@
+#include "../renderer.hpp"
+#include "glfwRenderer.hpp"
 #include "glfwFrameContext.hpp"
+
 #include <thread>
 #include <chrono>
 #include <GLFW/glfw3.h>
 
 namespace AntColony::Render::GLFW
 {
-    GLFWFrameContext::GLFWFrameContext(GLFWwindow *window, float frameRate)
-        : window(window), frameRate(frameRate), startTime(std::chrono::steady_clock::now())
+    GLFWFrameContext::GLFWFrameContext(GLFWwindow *window, float frameRate, const GLFWRenderer &renderer)
+        : window(window), renderer(renderer), frameRate(frameRate), startTime(std::chrono::steady_clock::now())
     {
     }
 
@@ -20,6 +23,8 @@ namespace AntColony::Render::GLFW
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
+    const Renderer &GLFWFrameContext::getRenderer() const { return renderer; }
 
     GLFWFrameContext::~GLFWFrameContext()
     {
@@ -35,6 +40,4 @@ namespace AntColony::Render::GLFW
             std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(frameRate - frameDuration.count())));
         }
     }
-
-    GLFWwindow *GLFWFrameContext::getWindow() { return window; }
 }

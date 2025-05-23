@@ -14,7 +14,7 @@ namespace AntColony::Simulation
         Simulation();
 
         void update(Render::FrameContext &ctx);
-        void render(Render::FrameContext &ctx) const;
+        void render(const Render::FrameContext &ctx) const;
 
     private:
         Colony colony;

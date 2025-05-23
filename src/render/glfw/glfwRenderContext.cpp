@@ -1,5 +1,6 @@
 #include "glfwRenderContext.hpp"
 #include "glfwFrameContext.hpp"
+#include "glfwRenderer.hpp"
 #include "constants.hpp"
 
 #include <GLFW/glfw3.h>
@@ -7,7 +8,7 @@
 
 namespace AntColony::Render::GLFW
 {
-    GLFWRenderContext::GLFWRenderContext() : window(nullptr) {}
+    GLFWRenderContext::GLFWRenderContext() : isInited(false), window(nullptr), renderer(nullptr) {}
 
     void GLFWRenderContext::init()
     {
@@ -27,9 +28,11 @@ namespace AntColony::Render::GLFW
         glfwMakeContextCurrent(w);
         glfwSetFramebufferSizeCallback(w, framebufferSizeCallback);
         window = w;
+        renderer = GLFWRenderer(window);
+        isInited = true;
     }
 
-    bool GLFWRenderContext::getInited() const { return window != nullptr; }
+    bool GLFWRenderContext::getInited() const { return isInited; }
     bool GLFWRenderContext::shouldClose() const { return glfwWindowShouldClose(window); }
 
     void GLFWRenderContext::framebufferSizeCallback(GLFWwindow *window, int width, int height)
@@ -41,9 +44,9 @@ namespace AntColony::Render::GLFW
         glMatrixMode(GL_MODELVIEW);
     }
 
-    std::unique_ptr<FrameContext> GLFWRenderContext::getFrameContext()
+    std::unique_ptr<FrameContext> GLFWRenderContext::getFrameContext() const
     {
-        return std::make_unique<GLFWFrameContext>(window, FRAME_RATE);
+        return std::make_unique<GLFWFrameContext>(window, FRAME_RATE, renderer);
     }
 
     GLFWRenderContext::~GLFWRenderContext()

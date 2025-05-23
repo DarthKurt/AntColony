@@ -5,8 +5,6 @@
 
 #include "../core/point.hpp"
 
-#include <GLFW/glfw3.h>
-
 namespace AntColony::Simulation
 {
     class Food : public Entity, public BaseEntity
@@ -15,7 +13,7 @@ namespace AntColony::Simulation
         Food(Core::Point position, float size, int capacity);
 
         void bite();
-        void render(GLFWwindow *window) const override;
+        void render(const Render::Renderer &renderer) const override;
 
         int getCapacity() const;
         Core::Point getPosition() const override;

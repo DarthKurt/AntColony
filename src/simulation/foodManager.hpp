@@ -11,7 +11,7 @@ namespace AntColony::Simulation
         FoodManager(Core::Point colonyCenter, float colonyRadius);
 
         void update();
-        void render(GLFWwindow *window) const;
+        void render(const Render::Renderer &renderer) const;
 
         std::vector<Food> &getFoodParticles();
 
