@@ -16,9 +16,15 @@ set(LIBS_DIR "${CMAKE_BINARY_DIR}/libs")
 
 file(MAKE_DIRECTORY ${LIBS_DIR})
 
-add_custom_target(copy_glfw ALL
-    COMMAND ${CMAKE_COMMAND} -E copy "${GLFW_LIBRARY_DIRS}/libglfw.dylib" "${LIBS_DIR}/libglfw.dylib"
-)
+if(APPLE)
+    add_custom_target(copy_glfw ALL
+        COMMAND ${CMAKE_COMMAND} -E copy "${GLFW_LIBRARY_DIRS}/libglfw.dylib" "${LIBS_DIR}/libglfw.dylib"
+    )
+elseif(MINGW)
+    add_custom_target(copy_glfw ALL
+        COMMAND ${CMAKE_COMMAND} -E copy "${GLFW_LIBRARY_DIRS}/libglfw3.a" "${LIBS_DIR}/libglfw3.a"
+    )
+endif()
 
 add_dependencies(AntColonySim copy_glfw)
 
@@ -32,7 +38,9 @@ find_package(OpenGL REQUIRED)
 # Подключаем зависимости по платформе
 if(APPLE)
     target_compile_definitions(AntColonySim PRIVATE -DGL_SILENCE_DEPRECATION)
-    target_link_libraries(AntColonySim "${LIBS_DIR}/libglfw.dylib" ${OPENGL_LIBRARIES}
+    target_link_libraries(AntColonySim 
+        "${LIBS_DIR}/libglfw.dylib"
+        "${OPENGL_LIBRARIES}"
         "-framework Cocoa"
         "-framework IOKit"
         "-framework CoreVideo")
@@ -40,4 +48,10 @@ elseif(WIN32)
     target_link_libraries(AntColonySim ${GLFW_LIBRARIES} ${OPENGL_LIBRARIES} opengl32 gdi32)
 elseif(UNIX)
     target_link_libraries(AntColonySim ${GLFW_LIBRARIES} ${OPENGL_LIBRARIES} dl X11 pthread)
+elseif(MINGW)
+    target_link_libraries(AntColonySim 
+        "${OPENGL_LIBRARIES}"
+        gdi32
+        opengl32
+        "${LIBS_DIR}/libglfw3.a")
 endif()
