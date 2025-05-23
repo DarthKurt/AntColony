@@ -1,4 +1,4 @@
-#include "food.h"
+#include "food.hpp"
 
 Food::Food(Point position, float size, int capacity) : Entity(position, 0x387d27, size), capacity(capacity) {}
 

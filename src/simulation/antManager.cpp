@@ -1,4 +1,4 @@
-#include "../utils/viewPort.h"
+#include "../utils/viewPort.hpp"
 #include "antManager.hpp"
 
 #include <algorithm>
@@ -104,7 +104,7 @@ std::vector<Point> AntManager::generateHexGrid(Point center, float radius, float
     return positions;
 }
 
-bool AntManager::checkAntCollisions(const Point &newPosition, float antSize, size_t currentIndex)
+bool AntManager::checkAntCollisions(const Point &newPosition, float antSize, size_t currentIndex, const std::vector<Ant> &ants)
 {
     auto hasCollision = false;
 
@@ -148,7 +148,7 @@ bool AntManager::checkCollision(
     const Point &lCenter,
     const Point &rCenter,
     const float &lSize,
-    const float &rSize) const
+    const float &rSize)
 {
     const float distance = lCenter.distanceTo(rCenter);
     return distance < (lSize + rSize);
@@ -170,7 +170,7 @@ Point AntManager::calcVelocityTowards(const Point &oldPosition, const Point &new
     return Point(dx * strength, dy * strength);
 }
 
-Point AntManager::calcRepulsion(const Ant &ant, size_t currentIndex)
+Point AntManager::calcRepulsion(const Ant &ant, size_t currentIndex) const
 {
     const auto minSpacing = ant.getSize() * COLLISION_COEF;
     const auto currentPosition = ant.getPosition();
@@ -248,7 +248,7 @@ void AntManager::updateAnt(const Colony &colony, std::vector<Food> &food, size_t
     {
         // Try moving with current velocity
         const auto newPosition = currentPosition + currentVelocity;
-        bool validPosition = !checkAntCollisions(newPosition, antSize, currentIndex) && 
+        bool validPosition = !checkAntCollisions(newPosition, antSize, currentIndex, ants) &&
                              checkViewportBoundaries(newPosition);
 
         if (validPosition)
@@ -259,7 +259,7 @@ void AntManager::updateAnt(const Colony &colony, std::vector<Food> &food, size_t
             {
                 // Stop moving when food is found
                 ant.setVelocity(Point(0.0f, 0.0f));
-                
+
                 // Collect food
                 ant.biteFood(*collidedFood);
             }
@@ -284,8 +284,8 @@ void AntManager::updateAnt(const Colony &colony, std::vector<Food> &food, size_t
         const auto newPosition = currentPosition + repulsion;
 
         // Check if this position is valid
-        auto validPosition = !checkAntCollisions(newPosition, antSize, currentIndex) && 
-                            checkViewportBoundaries(newPosition);
+        auto validPosition = !checkAntCollisions(newPosition, antSize, currentIndex, ants) &&
+                             checkViewportBoundaries(newPosition);
 
         if (validPosition)
         {
@@ -295,7 +295,7 @@ void AntManager::updateAnt(const Colony &colony, std::vector<Food> &food, size_t
             {
                 // Stop to collect food
                 ant.setVelocity(Point(0.0f, 0.0f));
-                
+
                 // Collect food
                 ant.biteFood(*collidedFood);
             }

@@ -1,5 +1,5 @@
-#include "ant.h"
-#include "../utils/viewPort.h"
+#include "ant.hpp"
+#include "../utils/viewPort.hpp"
 
 // Constructor: Initializes ant position
 Ant::Ant(Point position, float size)

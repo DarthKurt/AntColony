@@ -1,9 +1,9 @@
 #pragma once
 
 #include <vector>
-#include "ant.h"
-#include "colony.h"
-#include "food.h"
+#include "ant.hpp"
+#include "colony.hpp"
+#include "food.hpp"
 
 /**
  * @class AntManager
@@ -26,20 +26,20 @@ public:
      * @param colony The colony where ants will spawn
      * @param antSize The desired size of ants
      */
-    void spawnAnts(const Colony& colony, const float antSize);
+    void spawnAnts(const Colony &colony, const float antSize);
 
     /**
      * @brief Updates all ants' positions and states
      * @param colony The colony that ants interact with
      * @param food Vector of food sources that ants can interact with
      */
-    void update(const Colony& colony, std::vector<Food>& food);
+    void update(const Colony &colony, std::vector<Food> &food);
 
     /**
      * @brief Renders all ants to the window
      * @param window The GLFW window to render to
      */
-    void render(GLFWwindow* window) const;
+    void render(GLFWwindow *window) const;
 
 private:
     /** Stores all ants in the simulation */
@@ -52,16 +52,17 @@ private:
      * @param cellSize Size of each hexagonal cell
      * @return Vector of points representing positions for the hexagonal grid
      */
-    std::vector<Point> generateHexGrid(Point center, float radius, float cellSize);
+    static std::vector<Point> generateHexGrid(Point center, float radius, float cellSize);
 
     /**
      * @brief Checks if a position will collide with any other ant
      * @param newPosition Position to check for collisions
      * @param antSize Size of the ant
      * @param currentIndex Index of the current ant (to avoid self-collision)
+     * @param ants Vector of ants to check against
      * @return True if collision detected, false otherwise
      */
-    bool checkAntCollisions(const Point& newPosition, float antSize, size_t currentIndex);
+    static bool checkAntCollisions(const Point &newPosition, float antSize, size_t currentIndex, const std::vector<Ant> &ants);
 
     /**
      * @brief Checks if a position collides with food and returns the first food encountered
@@ -70,7 +71,7 @@ private:
      * @param food Vector of food sources to check against
      * @return Pointer to collided food or nullptr if no collision
      */
-    Food* checkFoodCollisions(const Point& newPosition, float antSize, std::vector<Food>& food);
+    static Food *checkFoodCollisions(const Point &newPosition, float antSize, std::vector<Food> &food);
 
     /**
      * @brief Calculates velocity vector towards a target
@@ -79,7 +80,7 @@ private:
      * @param strength Strength of the movement
      * @return Velocity vector pointing towards the target
      */
-    Point calcVelocityTowards(const Point& oldPosition, const Point& newPosition, float strength);
+    static Point calcVelocityTowards(const Point &oldPosition, const Point &newPosition, float strength);
 
     /**
      * @brief Computes repulsion force to avoid collisions with nearby ants
@@ -87,7 +88,7 @@ private:
      * @param currentIndex Index of the current ant
      * @return Repulsion force vector
      */
-    Point calcRepulsion(const Ant& ant, size_t currentIndex);
+    Point calcRepulsion(const Ant &ant, size_t currentIndex) const;
 
     /**
      * @brief Updates a single ant's position and state
@@ -95,7 +96,7 @@ private:
      * @param food Vector of food sources
      * @param currentIndex Index of the ant to update
      */
-    void updateAnt(const Colony& colony, std::vector<Food>& food, size_t currentIndex);
+    void updateAnt(const Colony &colony, std::vector<Food> &food, size_t currentIndex);
 
     /**
      * @brief Checks if two circles collide
@@ -105,9 +106,9 @@ private:
      * @param rSize Radius of the second circle
      * @return True if circles collide, false otherwise
      */
-    bool checkCollision(
-        const Point& lCenter,
-        const Point& rCenter,
-        const float& lSize,
-        const float& rSize) const;
+    static bool checkCollision(
+        const Point &lCenter,
+        const Point &rCenter,
+        const float &lSize,
+        const float &rSize);
 };

@@ -1,7 +1,6 @@
-#ifndef FOOD_MANAGER_H
-#define FOOD_MANAGER_H
+#pragma once 
 
-#include "food.h"
+#include "food.hpp"
 #include <vector>
 
 class FoodManager
@@ -15,12 +14,10 @@ public:
     std::vector<Food>& getFoodParticles();
 
 private:
-    float size;
+    float colonyRadius;
     void spawnFood();
     void removeDepletedFood();
-    float getCoordInBoundaries(float innerSpot, float itemSize);
+    static float getCoordInBoundaries(float innerSpot, float itemSize);
     
     std::vector<Food> foodParticles;
 };
-
-#endif

@@ -1,5 +1,5 @@
-#include "entity.h"
-#include "../utils/viewPort.h"
+#include "entity.hpp"
+#include "../utils/viewPort.hpp"
 
 #include <algorithm>
 #include <iostream>

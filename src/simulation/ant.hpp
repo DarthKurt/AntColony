@@ -1,8 +1,7 @@
-#ifndef ANT_H
-#define ANT_H
+#pragma once
 
-#include "entity.h"
-#include "food.h"
+#include "entity.hpp"
+#include "food.hpp"
 
 #include <GLFW/glfw3.h>
 #include <vector>
@@ -18,8 +17,8 @@ public:
     void biteFood(Food &food);
     void dropFood();
 
-    void setPosition(Point position);
-    void setVelocity(Point velocity);
+    void setPosition(Point newPosition);
+    void setVelocity(Point newVelocity);
     Point getVelocity() const;
 
     bool isBusy() const;
@@ -34,4 +33,3 @@ private:
     bool carryFood;
 };
 
-#endif

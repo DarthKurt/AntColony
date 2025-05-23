@@ -24,7 +24,7 @@ void Simulation::update(AntColony::Render::FrameContext &ctx)
     foodManager.update();
 }
 
-void Simulation::render(AntColony::Render::FrameContext &ctx)
+void Simulation::render(AntColony::Render::FrameContext &ctx) const
 {
     // TODO: get rid of GLFWFrameContext
     auto &glfwFrameContext = static_cast<AntColony::Render::GLFW::GLFWFrameContext&>(ctx);

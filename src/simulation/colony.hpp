@@ -1,7 +1,6 @@
-#ifndef COLONY_H
-#define COLONY_H
+#pragma once
 
-#include "entity.h"
+#include "entity.hpp"
 
 #include <GLFW/glfw3.h>
 #include <vector>
@@ -17,5 +16,3 @@ public:
     Point getPosition() const override;
     float getSize() const override;
 };
-
-#endif

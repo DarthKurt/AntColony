@@ -1,5 +1,5 @@
-#include "colony.h"
-#include "../utils/viewPort.h"
+#include "colony.hpp"
+#include "../utils/viewPort.hpp"
 
 Colony::Colony(Point position, float size)
     : Entity(position, 0x7d4827, size)

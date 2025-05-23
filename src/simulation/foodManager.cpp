@@ -1,9 +1,9 @@
-#include "foodManager.h"
-#include "../utils/viewPort.h"
+#include "foodManager.hpp"
+#include "../utils/viewPort.hpp"
 
 #include <algorithm>
 
-FoodManager::FoodManager(Point center, float size) : size(size) {}
+FoodManager::FoodManager(Point colonyCenter, float colonyRadius) : colonyRadius(colonyRadius) {}
 
 void FoodManager::spawnFood()
 {
@@ -12,8 +12,8 @@ void FoodManager::spawnFood()
     Point foodPosition;
 
     float x, y;
-    x = getCoordInBoundaries(size, foodSize);
-    y = getCoordInBoundaries(size, foodSize);
+    x = getCoordInBoundaries(colonyRadius, foodSize);
+    y = getCoordInBoundaries(colonyRadius, foodSize);
 
     foodPosition = Point(x, y);
     foodParticles.emplace_back(foodPosition, foodSize, maxCapacity);

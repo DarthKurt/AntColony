@@ -1,4 +1,4 @@
-#include "viewPort.h"
+#include "viewPort.hpp"
 #include <GLFW/glfw3.h>
 
 void setColor(const unsigned int hexColor)

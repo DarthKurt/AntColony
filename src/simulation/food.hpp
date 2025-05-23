@@ -1,7 +1,6 @@
-#ifndef FOOD_H
-#define FOOD_H
+#pragma once
 
-#include "entity.h"
+#include "entity.hpp"
 
 #include <GLFW/glfw3.h>
 
@@ -20,5 +19,3 @@ public:
 private:
     int capacity;
 };
-
-#endif

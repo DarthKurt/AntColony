@@ -1,8 +1,8 @@
 #ifndef SIMULATION_HPP
 #define SIMULATION_HPP
 
-#include "colony.h"
-#include "foodManager.h"
+#include "colony.hpp"
+#include "foodManager.hpp"
 #include "antManager.hpp"
 #include "../render/frameContext.hpp"
 
@@ -12,7 +12,7 @@ public:
     Simulation();
 
     void update(AntColony::Render::FrameContext &ctx);
-    void render(AntColony::Render::FrameContext &ctx);
+    void render(AntColony::Render::FrameContext &ctx) const;
 
 private:
     Colony colony;
