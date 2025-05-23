@@ -278,9 +278,6 @@ namespace AntColony::Simulation
 
                     if (collidedFood)
                     {
-                        // Stop moving when food is found
-                        ant.setVelocity(Core::Point(0.0f, 0.0f));
-
                         // Collect food
                         ant.biteFood(collidedFood);
                     }
@@ -314,9 +311,6 @@ namespace AntColony::Simulation
                 auto *collidedFood = checkFoodCollisions(newPosition, antSize, food);
                 if (collidedFood && !ant.isBusy())
                 {
-                    // Stop to collect food
-                    ant.setVelocity(Core::Point(0.0f, 0.0f));
-
                     // Collect food
                     ant.biteFood(collidedFood);
                 }

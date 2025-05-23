@@ -23,75 +23,78 @@ double calculateStandardDeviation(const std::vector<int> &values, double mean)
     return std::sqrt(sumSquaredDiff / values.size());
 }
 
-// Helper class to analyze spatial distribution
-class SpatialDistributionAnalyzer
+// Helper class to analyze radial spatial distribution using concentric rings
+class RadialDistributionAnalyzer
 {
 public:
-    SpatialDistributionAnalyzer(float gridSize, float minX, float maxX, float minY, float maxY)
-        : gridSize(gridSize), minX(minX), maxX(maxX), minY(minY), maxY(maxY)
+    RadialDistributionAnalyzer(float minRadius, float maxRadius, int numRings, Point center)
+        : minRadius(minRadius), maxRadius(maxRadius), numRings(numRings), center(center)
     {
-
-        gridWidth = static_cast<int>(std::ceil((maxX - minX) / gridSize));
-        gridHeight = static_cast<int>(std::ceil((maxY - minY) / gridSize));
-
-        grid.resize(gridWidth * gridHeight, 0);
+        rings.resize(numRings, 0);
+        
+        // Calculate the area of each ring (should be equal)
+        ringArea = M_PI * (maxRadius * maxRadius - minRadius * minRadius) / numRings;
+        
+        // Calculate ring boundaries (equal area per ring)
+        ringBoundaries.resize(numRings + 1);
+        ringBoundaries[0] = minRadius;
+        ringBoundaries[numRings] = maxRadius;
+        
+        for (int i = 1; i < numRings; i++) {
+            // Formula for equal-area rings: r_i = sqrt(r_min² + i*(r_max² - r_min²)/numRings)
+            ringBoundaries[i] = std::sqrt(minRadius * minRadius + 
+                                i * (maxRadius * maxRadius - minRadius * minRadius) / numRings);
+        }
     }
 
     void addPoint(float x, float y)
     {
-        int gridX = static_cast<int>((x - minX) / gridSize);
-        int gridY = static_cast<int>((y - minY) / gridSize);
-
-        if (gridX >= 0 && gridX < gridWidth && gridY >= 0 && gridY < gridHeight)
-        {
-            grid[gridY * gridWidth + gridX]++;
+        float dx = x - center.x;
+        float dy = y - center.y;
+        float distance = std::sqrt(dx * dx + dy * dy);
+        
+        // Find which ring this point belongs to
+        for (int i = 0; i < numRings; i++) {
+            if (distance >= ringBoundaries[i] && distance < ringBoundaries[i + 1]) {
+                rings[i]++;
+                break;
+            }
         }
     }
 
     double calculateCoefficientOfVariation()
     {
         int totalPoints = 0;
-        for (int count : grid)
-        {
+        for (int count : rings) {
             totalPoints += count;
         }
 
-        double mean = static_cast<double>(totalPoints) / grid.size();
-        double stdDev = calculateStandardDeviation(grid, mean);
+        double mean = static_cast<double>(totalPoints) / rings.size();
+        double stdDev = calculateStandardDeviation(rings, mean);
 
         // Coefficient of variation = std deviation / mean
         return (mean > 0) ? (stdDev / mean) : 0.0;
     }
 
-    void printDistribution()
-    {
-        std::cout << "Grid distribution:" << std::endl;
-        for (int y = 0; y < gridHeight; ++y)
-        {
-            for (int x = 0; x < gridWidth; ++x)
-            {
-                std::cout << grid[y * gridWidth + x] << " ";
-            }
-            std::cout << std::endl;
-        }
-    }
-
 private:
-    float gridSize;
-    float minX, maxX, minY, maxY;
-    int gridWidth, gridHeight;
-    std::vector<int> grid;
+    float minRadius, maxRadius;
+    int numRings;
+    Point center;
+    std::vector<int> rings;
+    std::vector<float> ringBoundaries;
+    float ringArea;
 };
 
 TEST_CASE("FoodManager distributes food particles evenly", "[foodmanager]")
 {
     // Set up parameters for the test
     Point colonyCenter(0.0f, 0.0f);
-    float colonyRadius = 5.0f;
-    float foodRadius = 0.5f;
+    float colonyRadius = 50.0f;
+    float foodRadius = 5.0f;
+    ViewPort viewport(-1000.0f, -1000.0f, 1000.0f, 1000.0f);
 
     // Create food manager
-    FoodManager foodManager(colonyCenter, colonyRadius, foodRadius, AntColony::Core::ViewPort(-10.0f, -10.0f, 10.0f, 10.0f));
+    FoodManager foodManager(colonyCenter, colonyRadius, foodRadius, viewport);
 
     // Generate a large number of food particles to ensure statistical significance
     const int numFrameCycles = 1000000;
@@ -103,36 +106,28 @@ TEST_CASE("FoodManager distributes food particles evenly", "[foodmanager]")
     // Get the generated food particles
     const auto &foodParticles = foodManager.getFoodParticles();
 
-    // Define grid size for analyzing distribution
-    float gridSize = 5.0f; // Adjust based on the expected density
+    // Define parameters for radial analysis
+    float minRadius = colonyRadius; // Start from colony edge
+    float maxRadius = 3 * colonyRadius; // Analyze up to 3x colony radius
+    int numRings = 10; // Divide into 10 equal-area rings
 
-    // Define boundaries for analysis (adjust as needed based on your simulation)
-    float minX = colonyCenter.x - colonyRadius * 3;
-    float maxX = colonyCenter.x + colonyRadius * 3;
-    float minY = colonyCenter.y - colonyRadius * 3;
-    float maxY = colonyCenter.y + colonyRadius * 3;
-
-    SpatialDistributionAnalyzer analyzer(gridSize, minX, maxX, minY, maxY);
+    RadialDistributionAnalyzer analyzer(minRadius, maxRadius, numRings, colonyCenter);
 
     // Add all food particles to the analyzer
     for (const auto &food : foodParticles)
     {
-        analyzer.addPoint(food->getPosition().x, food->getPosition().y);
+        const auto &point = food->getPosition();
+        analyzer.addPoint(point.x, point.y);
     }
 
-    // Optional: Print the distribution for visual debugging
-    analyzer.printDistribution();
-
     // Calculate coefficient of variation (CV)
-    // Lower CV means more even distribution
     double coeffOfVariation = analyzer.calculateCoefficientOfVariation();
 
     // Log the result
     std::cout << "Coefficient of Variation: " << coeffOfVariation << std::endl;
 
     // For a uniform random distribution, we expect some variation, but not too much
-    // The threshold can be adjusted based on expected distribution properties
-    REQUIRE(coeffOfVariation < 0.5); // This is an example threshold, adjust as needed
+    REQUIRE(coeffOfVariation < 0.5);
 
     // Additionally, check that food particles are outside the colony
     for (const auto food : foodParticles)

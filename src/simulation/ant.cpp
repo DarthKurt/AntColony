@@ -10,14 +10,22 @@ namespace AntColony::Simulation
 
     void Ant::biteFood(Food *food)
     {
-        // Reduce food capacity
-        food->take();
-        carryFood = true;
+        if (!carryFood)
+        {
+            // Reduce food capacity
+            food->take();
+            carryFood = true;
+            velocity *= 0;
+        }
     }
 
     void Ant::dropFood()
     {
-        carryFood = false;
+        if (carryFood)
+        {
+            carryFood = false;
+            velocity *= 0;
+        }
     }
 
     void Ant::render(const Render::Renderer &renderer) const

@@ -33,48 +33,43 @@ namespace AntColony::Simulation
         const float distToTop = viewPort.maxY - colonyCenter.y - initialFoodSize;
         const float distToBottom = colonyCenter.y - viewPort.minY - initialFoodSize;
 
-        // Generate position using simplified logic
-        float x, y;
-
-        // First determine which quadrant to place food in
-        auto quadrant = random.getInt(0, 3);
-        auto angleMin = quadrant * M_PI_2;
-        auto angleMax = angleMin + M_PI_2;
-
-        debug(startTime, "Spawn in quadrant: " + std::to_string(quadrant) +
-                             ". Min angle: " + std::to_string(angleMin) +
-                             ". Max angle: " + std::to_string(angleMax));
-
-        float angle = random.getFloat(angleMin, angleMax);
+        // Use a full 0-2π angle for uniform angular distribution
+        float angle = random.getFloat(0, 2 * M_PI);
 
         debug(startTime, "Selected angle: " + std::to_string(angle));
 
-        // Use angle to determine max distance in that direction
+        // Calculate direction vector
         float dx = std::cos(angle);
         float dy = std::sin(angle);
 
-        // Fast approximation to find distance to edge
+        // Find maximum distance in this direction
         float maxDist;
         if (dx > 0)
         {
             maxDist = (dy > 0)
-                          ? std::min(distToRight / dx, distToTop / dy)
-                          : std::min(distToRight / dx, distToBottom / -dy);
+                        ? std::min(distToRight / dx, distToTop / dy)
+                        : std::min(distToRight / dx, distToBottom / -dy);
         }
         else
         {
             maxDist = (dy > 0)
-                          ? std::min(distToLeft / -dx, distToTop / dy)
-                          : std::min(distToLeft / -dx, distToBottom / -dy);
+                        ? std::min(distToLeft / -dx, distToTop / dy)
+                        : std::min(distToLeft / -dx, distToBottom / -dy);
         }
 
-        // Generate actual distance
-        float distance = random.getFloat(colonyRadius + initialFoodSize, maxDist);
+        // For uniform spatial distribution, we need to sample based on area
+        float minRSquared = (colonyRadius + initialFoodSize) * (colonyRadius + initialFoodSize);
+        float maxRSquared = maxDist * maxDist;
+        
+        // Sample from r² distribution for uniform area coverage
+        float rSquared = random.getFloat(minRSquared, maxRSquared);
+        float distance = std::sqrt(rSquared);
+        
         debug(startTime, "Selected distance: " + std::to_string(distance));
 
         // Calculate position
-        x = colonyCenter.x + distance * dx;
-        y = colonyCenter.y + distance * dy;
+        float x = colonyCenter.x + distance * dx;
+        float y = colonyCenter.y + distance * dy;
 
         auto food = std::make_unique<Food>(
             Core::Point(x, y),
