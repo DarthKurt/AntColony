@@ -31,11 +31,6 @@ namespace AntColony::Utils
          */
         float getFloat(float min, float max);
 
-        /**
-         *  @brief True with specified probability (0.0 to 1.0)
-         */
-        bool getBool(float probability = 0.5f);
-
     private:
         RandomGenerator();
         std::mt19937 engine;
