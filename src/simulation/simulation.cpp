@@ -1,6 +1,5 @@
 #include "simulation.hpp"
 #include "../render/frameContext.hpp"
-#include "../render/glfw/glfwFrameContext.hpp"
 
 namespace AntColony::Simulation
 {
