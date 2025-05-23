@@ -6,9 +6,10 @@
 #include <iostream>
 
 // Window dimensions
-const int WIDTH = 800;
+const int WIDTH = 600;
 const int HEIGHT = 600;
 
+// Scale coordinates
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
     float aspectRatio = (float)width / (float)height;
@@ -85,8 +86,7 @@ int main()
         glfwPollEvents();
 
         // Control speed
-        while (glfwGetTime() - startTime < targetFrameTime)
-            ;
+        while (glfwGetTime() - startTime < targetFrameTime);
     }
 
     // Cleanup

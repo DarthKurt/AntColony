@@ -23,8 +23,8 @@ public:
     // Abstract method for rendering
     virtual void render(GLFWwindow *window) = 0;
 
-    virtual Point getPosition() const;
-    virtual float getSize() const;
+    virtual Point getPosition() const = 0;
+    virtual float getSize() const = 0;
 };
 
 #endif

@@ -15,7 +15,7 @@ public:
     // Spawn ants at the colony
     void spawnAnts(const Colony &colony);
 
-    void update(const Colony &colony, std::vector<Food> &food);
+    void update(const Colony &, std::vector<Food> &);
 
     void render(GLFWwindow *window);
 
@@ -25,7 +25,12 @@ public:
 private:
     // Stores all ants in the simulation
     std::vector<Ant> ants;
-    std::vector<Point> generateHexGrid(Point center, float radius, float cellSize);
+    std::vector<Point> generateHexGrid(Point, float, float);
+    bool checkAntCollisions(const Point &, float, size_t);
+    Food *checkFoodCollisions(const Point &, float, std::vector<Food> &);
+    Point calcVelocityTowards(const Point &, const Point &, float);
+    Point calcRepulsion(const Ant &, size_t);
+    void updateAnt(const Colony &, std::vector<Food> &, size_t);
 
     bool checkCollision(
         const Point &lCenter,

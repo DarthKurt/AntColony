@@ -1,6 +1,8 @@
 #include "viewPort.h"
 #include "foodManager.h"
 
+#include <algorithm>
+
 FoodManager::FoodManager(Point center, float size) : size(size) {}
 
 void FoodManager::spawnFood()

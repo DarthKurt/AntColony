@@ -1,7 +1,11 @@
+#include "viewPort.h"
 #include "antManager.h"
 
+#include <algorithm>
 #include <random>
+#include <vector>
 #include <cmath>
+#include <iostream>
 
 AntManager::AntManager() {}
 
@@ -44,39 +48,6 @@ void AntManager::spawnAnts(const Colony &colony)
     for (int i = 0; i < numAnts; i++)
     {
         ants.emplace_back(shuffledPositions[i], antSize);
-    }
-}
-
-// Updating ants (movement, collisions, food interactions)
-void AntManager::updateAnts(Colony &colony, std::vector<Food> &food)
-{
-    for (size_t i = 0; i < ants.size(); i++)
-    {
-        Ant &ant = ants[i];
-
-        // Set velocity towards the colony (if no other forces override it)
-        Point intention = ant.getIntentionTowards(colony.center, 0.3f);
-        ant.setVelocity(intention);
-
-        Point newPosition = ant.getPosition() + ant.getVelocity();
-        bool validPosition = !ant.checkAntCollisions(newPosition, ants, i) &&
-                             ant.checkViewportBoundaries(newPosition);
-
-        if (validPosition)
-        {
-            ant.setPosition(newPosition);
-        }
-        else
-        {
-            ant.setVelocity(ant.getRepulsion(ants, i));
-        }
-
-        // Check if ant reaches colony and drop food
-        if (ant.getPosition().distanceTo(colony.center) < colony.colonyRadius)
-        {
-            colony.depositFood();
-            ant.setCarryingFood(false);
-        }
     }
 }
 
@@ -132,7 +103,7 @@ std::vector<Point> AntManager::generateHexGrid(Point center, float radius, float
     return positions;
 }
 
-bool AntManager::checkAntCollisions(const Point &newPosition, size_t currentIndex)
+bool AntManager::checkAntCollisions(const Point &newPosition, float antSize, size_t currentIndex)
 {
     bool hasCollision = false;
 
@@ -142,7 +113,8 @@ bool AntManager::checkAntCollisions(const Point &newPosition, size_t currentInde
             continue;
 
         const Ant &otherAnt = ants[i];
-        if (checkCollision(newPosition, otherAnt.getPosition(), entitySize, otherAnt.getSize()))
+
+        if (checkCollision(newPosition, otherAnt.getPosition(), antSize, otherAnt.getSize()))
         {
             // Try again if collision detected
             hasCollision = true;
@@ -153,14 +125,14 @@ bool AntManager::checkAntCollisions(const Point &newPosition, size_t currentInde
     return hasCollision;
 }
 
-Food *AntManager::checkFoodCollisions(const Point &newPosition, std::vector<Food> &food)
+Food *AntManager::checkFoodCollisions(const Point &newPosition, float antSize, std::vector<Food> &food)
 {
     for (auto &piece : food)
     {
         if (piece.getCapacity() <= 0)
             continue;
 
-        if (checkCollision(newPosition, piece.getPosition(), entitySize, piece.getSize()))
+        if (checkCollision(newPosition, piece.getPosition(), antSize, piece.getSize()))
         {
             // Return pointer to collided food
             return &piece;
@@ -183,15 +155,12 @@ bool AntManager::checkCollision(
     return res;
 }
 
-Point AntManager::calcVelocityTowards(const Point &newPosition, const float strength)
+Point AntManager::calcVelocityTowards(const Point &oldPostion, const Point &newPosition, const float strength)
 {
-    // Strength of attraction to the point
-    const float strength = 0.005f;
+    float dx = newPosition.x - oldPostion.x;
+    float dy = newPosition.y - oldPostion.y;
 
-    float dx = newPosition.x - position.x;
-    float dy = newPosition.y - position.y;
-
-    const float distance = position.distanceTo(newPosition);
+    const float distance = oldPostion.distanceTo(newPosition);
 
     if (distance > 0.0f)
     {
@@ -206,6 +175,8 @@ Point AntManager::calcRepulsion(const Ant &ant, size_t currentIndex)
 {
     const float collisionCoef = 1.5f;
     const float minSpacing = ant.getSize() * collisionCoef;
+    const Point currentPosition = ant.getPosition();
+    const Point currentVelocity = ant.getPosition();
 
     static std::random_device rd;
     static std::mt19937 gen(rd());
@@ -220,13 +191,14 @@ Point AntManager::calcRepulsion(const Ant &ant, size_t currentIndex)
             continue;
 
         const Ant &otherAnt = ants[i];
+        const Point otherPosition = otherAnt.getPosition();
 
-        float dx = otherAnt.position.x - ant.position.x;
-        float dy = otherAnt.position.y - ant.position.y;
-        float distance = ant.position.distanceTo(otherAnt.position);
+        float dx = otherPosition.x - currentPosition.x;
+        float dy = otherPosition.y - currentPosition.y;
+        float distance = currentPosition.distanceTo(otherPosition);
 
         // **Apply repulsion ONLY if ant is getting closer**
-        float futureDistance = (ant.position + ant.velocity).distanceTo(otherAnt.position);
+        float futureDistance = (currentPosition + currentVelocity).distanceTo(otherPosition);
         if (distance < minSpacing && futureDistance < distance)
         {
             float strength = std::pow((minSpacing - distance) / minSpacing, 2);
@@ -236,7 +208,7 @@ Point AntManager::calcRepulsion(const Ant &ant, size_t currentIndex)
     }
 
     // Blend repulsion based on current velocity
-    float velocityMagnitude = std::sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
+    float velocityMagnitude = std::sqrt(currentVelocity.x * currentVelocity.x + currentVelocity.y * currentVelocity.y);
     float velocityInfluence = std::min(1.0f, velocityMagnitude / 0.1f); // Scale impact
 
     Point totalRepulsion = (velocityComponent * velocityInfluence) + (randomComponent * (1.0f - velocityInfluence));
@@ -254,34 +226,33 @@ Point AntManager::calcRepulsion(const Ant &ant, size_t currentIndex)
 }
 
 // Update ant movement
-void AntManager::update(const Colony &colony, std::vector<Food> &food, size_t currentIndex)
+void AntManager::updateAnt(const Colony &colony, std::vector<Food> &food, size_t currentIndex)
 {
     const Point colonyPostion = colony.getPosition();
     const float colonySize = colony.getSize();
 
-    const Ant &ant = ants[currentIndex];
-
-    // If carrying food, move toward colony
-    if (ant.isBusy())
-    {
-        const Point newVelocity = calcVelocityTowards(colonyPostion);
-        ant.setVelocity(newVelocity);
-    }
-
+    Ant &ant = ants[currentIndex];
     const Point currentVelocity = ant.getVelocity();
     const Point currentPosition = ant.getVelocity();
     const float antSize = ant.getSize();
 
+    // If carrying food, move toward colony
+    if (ant.isBusy())
+    {
+        const Point newVelocity = calcVelocityTowards(currentPosition, colonyPostion, 0.005f);
+        ant.setVelocity(newVelocity);
+    }
+
     if (ant.isMoving())
     {
         // Try moving with current velocity
-        Point newPosition = currentPosition + currentVelocity;
-        bool validPosition = !checkAntCollisions(newPosition, currentIndex) && checkViewportBoundaries(newPosition);
+        const Point newPosition = currentPosition + currentVelocity;
+        bool validPosition = !checkAntCollisions(newPosition, antSize, currentIndex) && checkViewportBoundaries(newPosition);
 
         if (validPosition)
         {
             // check food collision
-            Food *collidedFood = checkFoodCollisions(newPosition, food);
+            Food *collidedFood = checkFoodCollisions(newPosition, antSize, food);
             if (collidedFood && !ant.isBusy())
             {
                 // stop
@@ -314,13 +285,13 @@ void AntManager::update(const Colony &colony, std::vector<Food> &food, size_t cu
 
         newPosition = currentPosition + repulsion;
 
-        validPosition = !checkAntCollisions(newPosition, currentIndex) && checkViewportBoundaries(newPosition);
+        validPosition = !checkAntCollisions(newPosition, antSize, currentIndex) && checkViewportBoundaries(newPosition);
 
         // Move
         if (validPosition)
         {
             // check food collision
-            Food *collidedFood = checkFoodCollisions(newPosition, food);
+            Food *collidedFood = checkFoodCollisions(newPosition, antSize, food);
             if (collidedFood && !ant.isBusy())
             {
                 // stop
@@ -349,11 +320,10 @@ void AntManager::update(const Colony &colony, std::vector<Food> &food, size_t cu
 
 void AntManager::update(const Colony &colony, std::vector<Food> &food)
 {
-
     for (size_t i = 0; i < ants.size(); i++)
     {
         // Pass index instead of filtering in advance
-        update(colony, food, i);
+        updateAnt(colony, food, i);
     }
 }
 
