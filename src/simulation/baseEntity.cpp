@@ -1,5 +1,4 @@
 #include "baseEntity.hpp"
-#include "../utils/viewPort.hpp"
 #include "../core/color.hpp"
 
 namespace AntColony::Simulation

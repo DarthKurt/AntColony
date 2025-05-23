@@ -1,5 +1,3 @@
-#include "../core/logger.hpp"
-#include "../utils/viewPort.hpp"
 #include "../utils/consoleLogger.hpp"
 #include "../utils/randomGenerator.hpp"
 
@@ -9,8 +7,6 @@
 #include <cmath>
 #include <vector>
 #include <memory>
-
-using AntColony::Utils::checkViewportBoundaries;
 
 namespace AntColony::Simulation
 {
@@ -24,8 +20,11 @@ namespace AntColony::Simulation
     constexpr auto VELOCITY_SCALING_THRESHOLD = 0.1f;
     constexpr auto MAX_POSITION_ATTEMPTS = 10;
 
-    AntManager::AntManager() : AntManager(std::make_shared<Utils::ConsoleLogger>()) {}
-    AntManager::AntManager(std::shared_ptr<Core::Logger> logger) : logger(logger) {}
+    AntManager::AntManager(Core::ViewPort viewPort)
+        : AntManager(std::make_shared<Utils::ConsoleLogger>(), viewPort) {}
+
+    AntManager::AntManager(std::shared_ptr<Core::Logger> logger, Core::ViewPort viewPort)
+        : logger(logger), viewPort(viewPort) {}
 
     void AntManager::spawnAnts(const Colony &colony, const float antSize)
     {
@@ -268,8 +267,7 @@ namespace AntColony::Simulation
         {
             // Try moving with current velocity
             const auto newPosition = currentPosition + currentVelocity;
-            bool validPosition = !checkAntCollisions(newPosition, antSize, currentIndex, ants) &&
-                                 checkViewportBoundaries(newPosition);
+            bool validPosition = !checkAntCollisions(newPosition, antSize, currentIndex, ants) && viewPort.checkViewportBoundaries(newPosition);
 
             if (validPosition)
             {
@@ -304,8 +302,7 @@ namespace AntColony::Simulation
             const auto newPosition = currentPosition + repulsion;
 
             // Check if this position is valid
-            auto validPosition = !checkAntCollisions(newPosition, antSize, currentIndex, ants) &&
-                                 checkViewportBoundaries(newPosition);
+            auto validPosition = !checkAntCollisions(newPosition, antSize, currentIndex, ants) && viewPort.checkViewportBoundaries(newPosition);
 
             if (validPosition)
             {

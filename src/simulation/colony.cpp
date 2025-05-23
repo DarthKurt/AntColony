@@ -2,8 +2,6 @@
 #include "baseEntity.hpp"
 #include "../core/point.hpp"
 
-#include "../utils/viewPort.hpp"
-
 namespace AntColony::Simulation
 {
     Colony::Colony(Core::Point position, float size)

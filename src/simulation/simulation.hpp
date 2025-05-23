@@ -17,6 +17,9 @@ namespace AntColony::Simulation
         void render(const Render::FrameContext &ctx) const;
 
     private:
+
+        Simulation(Core::ViewPort viewPort, Core::Point colonyCenter, float colonySize, float foodSize, float antSize);
+
         Colony colony;
         FoodManager foodManager;
         AntManager antManager;

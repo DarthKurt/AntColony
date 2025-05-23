@@ -5,6 +5,7 @@
 #include "food.hpp"
 
 #include "../core/logger.hpp"
+#include "../core/viewPort.hpp"
 
 #include <vector>
 #include <memory>
@@ -25,12 +26,12 @@ namespace AntColony::Simulation
         /**
          * @brief Default constructor
          */
-        AntManager();
+        AntManager(Core::ViewPort viewPort);
 
         /**
          * @brief Constructor with custom logger
          */
-        explicit AntManager(std::shared_ptr<Core::Logger> logger);
+        explicit AntManager(std::shared_ptr<Core::Logger> logger, Core::ViewPort viewPort);
 
         /**
          * @brief Spawns ants at the provided colony
@@ -62,6 +63,11 @@ namespace AntColony::Simulation
          * @brief Stores logger utility
          */
         std::shared_ptr<Core::Logger> logger;
+
+        /**
+         * @brief Stores viewport
+         */
+        Core::ViewPort viewPort;
 
         /**
          * @brief Generates a grid of hexagonal cells inside a circle

@@ -1,5 +1,4 @@
 #include "ant.hpp"
-#include "../utils/viewPort.hpp"
 #include "../core/point.hpp"
 
 namespace AntColony::Simulation

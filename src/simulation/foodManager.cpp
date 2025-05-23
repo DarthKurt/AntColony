@@ -1,43 +1,62 @@
 #include "foodManager.hpp"
-#include "../utils/viewPort.hpp"
 #include "../utils/randomGenerator.hpp"
 
 #include <algorithm>
-
-using AntColony::Utils::LEFT_BOUNDARY;
-using AntColony::Utils::RIGHT_BOUNDARY;
+#include <cmath>
 
 namespace AntColony::Simulation
 {
-    FoodManager::FoodManager(Core::Point colonyCenter, float colonyRadius) : colonyRadius(colonyRadius) {}
+    FoodManager::FoodManager(Core::Point colonyCenter, float colonyRadius, float foodRadius, Core::ViewPort viewPort)
+        : colonyCenter(colonyCenter), colonyRadius(colonyRadius), foodRadius(foodRadius), viewPort(viewPort) {}
 
     void FoodManager::spawnFood()
     {
-        const float foodSize = 0.05f;
-        const int maxCapacity = 1;
-        Core::Point foodPosition;
-
-        float x, y;
-        x = getCoordInBoundaries(colonyRadius, foodSize);
-        y = getCoordInBoundaries(colonyRadius, foodSize);
-
-        foodPosition = Core::Point(x, y);
-        foodParticles.emplace_back(foodPosition, foodSize, maxCapacity);
-    }
-
-    float FoodManager::getCoordInBoundaries(float innerSpot, float itemSize)
-    {
         auto &random = AntColony::Utils::RandomGenerator::getInstance();
 
-        // Decide randomly whether to spawn food on the left or right side
-        if (random.getBool())
+        const auto maxCapacity = random.getInt(1, 3);
+
+        // Generate a random angle (0 to 2π)
+        const auto angle = random.getFloat(0, 2 * M_PI);
+
+        // Calculate direction vector
+        const auto dx = std::cos(angle);
+        const auto dy = std::sin(angle);
+
+        // Calculate distance to viewport boundaries in this direction
+        float distToEdge;
+        if (std::abs(dx) < 0.0001f)
         {
-            return LEFT_BOUNDARY + itemSize + random.getFloat(0.0f, 1.0f) * (innerSpot - itemSize);
+            // Vertical direction
+            distToEdge = (dy > 0) ? (viewPort.maxY - colonyCenter.y) : (colonyCenter.y - viewPort.minY);
+        }
+        else if (std::abs(dy) < 0.0001f)
+        {
+            // Horizontal direction
+            distToEdge = (dx > 0) ? (viewPort.maxX - colonyCenter.x) : (colonyCenter.x - viewPort.minX);
         }
         else
         {
-            return innerSpot + itemSize + random.getFloat(0.0f, 1.0f) * (RIGHT_BOUNDARY - itemSize - innerSpot);
+            // Diagonal direction - find which boundary we hit first
+            auto tx1 = (viewPort.minX - colonyCenter.x) / dx;
+            auto tx2 = (viewPort.maxX - colonyCenter.x) / dx;
+            auto ty1 = (viewPort.minY - colonyCenter.y) / dy;
+            auto ty2 = (viewPort.maxY - colonyCenter.y) / dy;
+
+            // Consider only positive distances
+            auto tx = (dx > 0) ? tx2 : tx1;
+            auto ty = (dy > 0) ? ty2 : ty1;
+
+            distToEdge = std::min(std::abs(tx), std::abs(ty));
         }
+
+        // Choose random distance between colony radius and edge (with buffer for food size)
+        auto distance = random.getFloat(colonyRadius + foodRadius, distToEdge - foodRadius);
+
+        // Calculate final position
+        auto x = colonyCenter.x + distance * dx;
+        auto y = colonyCenter.y + distance * dy;
+
+        foodParticles.emplace_back(Core::Point(x, y), foodRadius, maxCapacity);
     }
 
     void FoodManager::removeDepletedFood()
@@ -54,7 +73,7 @@ namespace AntColony::Simulation
         auto &random = AntColony::Utils::RandomGenerator::getInstance();
 
         // Random chance per cycle to spawn new food (0.4% chance)
-        if (random.getInt(0, 249) == 0)
+        if (random.getInt(0, 3) == 0)
             spawnFood();
 
         removeDepletedFood();
