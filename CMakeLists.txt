@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16)
 project(AntColonySim)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -12,8 +12,11 @@ if(CPP_CHECK)
 endif()
 
 # Add sources
-file(GLOB_RECURSE SIMULATION_SOURCES "src/*.cpp")
-add_executable(AntColonySim "${SIMULATION_SOURCES}")
+file(GLOB_RECURSE CORE_SOURCES "src/core/*.cpp")
+file(GLOB_RECURSE RENDER_SOURCES "src/render/*.cpp")
+file(GLOB_RECURSE SIMULATION_SOURCES "src/simulation/*.cpp")
+file(GLOB_RECURSE UTILS_SOURCES "src/utils/*.cpp")
+add_executable(AntColonySim "${CORE_SOURCES}" "${RENDER_SOURCES}" "${SIMULATION_SOURCES}" "${UTILS_SOURCES}" "src/main.cpp")
 
 # Находим GLFW через pkg-config
 find_package(PkgConfig REQUIRED)
@@ -40,18 +43,19 @@ add_dependencies(AntColonySim copy_glfw)
 include_directories(${GLFW_INCLUDE_DIRS})
 link_directories(${LIBS_DIR})
 
-# Находим OpenGL
+# Look for OpenGL
 find_package(OpenGL REQUIRED)
 
-# Подключаем зависимости по платформе
+# Platform-specific builds
 if(APPLE)
     target_compile_definitions(AntColonySim PRIVATE -DGL_SILENCE_DEPRECATION)
     target_link_libraries(AntColonySim 
         "${LIBS_DIR}/libglfw.dylib"
-        "${OPENGL_LIBRARIES}"
-        "-framework Cocoa"
-        "-framework IOKit"
-        "-framework CoreVideo")
+        "${OPENGL_LIBRARIES}")
+        # "${OPENGL_LIBRARIES}"
+        # "-framework Cocoa"
+        # "-framework IOKit"
+        # "-framework CoreVideo")
 elseif(WIN32)
     target_link_libraries(AntColonySim ${GLFW_LIBRARIES} ${OPENGL_LIBRARIES} opengl32 gdi32)
 elseif(UNIX)
@@ -62,4 +66,16 @@ elseif(MINGW)
         gdi32
         opengl32
         "${LIBS_DIR}/libglfw3.a")
+endif()
+
+# Add tests
+if(APPLE)
+    enable_testing()
+    find_package(Catch2 REQUIRED)
+    file(GLOB_RECURSE SIMULATION_TEST_SOURCES "tests/simulation/*.cpp")
+    add_executable(AntColonySimTests "${SIMULATION_TEST_SOURCES}" "${CORE_SOURCES}" "${RENDER_SOURCES}" "${SIMULATION_SOURCES}" "${UTILS_SOURCES}")
+    target_compile_definitions(AntColonySimTests PRIVATE -DGL_SILENCE_DEPRECATION)
+    target_link_libraries(AntColonySimTests "${LIBS_DIR}/libglfw.dylib" "${OPENGL_LIBRARIES}" "Catch2::Catch2WithMain")
+    include(Catch)
+    catch_discover_tests(AntColonySimTests)
 endif()
