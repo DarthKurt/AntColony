@@ -1,7 +1,10 @@
 #include "simulation.hpp"
+#include "../render/frameContext.hpp"
+#include "../render/glfw/glfwFrameContext.hpp"
 
 // Constants for ant behavior and simulation parameters
-namespace {
+namespace
+{
     constexpr auto COLONY_SIZE = 0.05f;
     constexpr auto ANT_SIZE = 0.05f;
 }
@@ -14,13 +17,20 @@ Simulation::Simulation()
     antManager.spawnAnts(colony, ANT_SIZE);
 }
 
-void Simulation::update()
+void Simulation::update(AntColony::Render::FrameContext &ctx)
 {
     std::vector<Food> &food = foodManager.getFoodParticles();
     antManager.update(colony, food);
     foodManager.update();
 }
 
-const Colony &Simulation::getColony() const { return colony; }
-const FoodManager &Simulation::getFoodManager() const { return foodManager; }
-const AntManager &Simulation::getAntManager() const { return antManager; }
+void Simulation::render(AntColony::Render::FrameContext &ctx)
+{
+    // TODO: get rid of GLFWFrameContext
+    auto &glfwFrameContext = static_cast<AntColony::Render::GLFW::GLFWFrameContext&>(ctx);
+    auto *window = glfwFrameContext.getWindow();
+
+    colony.render(window);
+    antManager.render(window);
+    foodManager.render(window);
+}

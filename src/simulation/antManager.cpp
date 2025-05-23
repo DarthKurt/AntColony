@@ -8,7 +8,8 @@
 #include <vector>
 
 // Constants for ant behavior and simulation parameters
-namespace {
+namespace
+{
     constexpr auto COLLISION_COEF = 1.5f;
     constexpr auto COLONY_TARGET_ATTRACTION = 0.005f;
     constexpr auto RANDOM_MOVEMENT = 0.025f;
@@ -21,24 +22,24 @@ namespace {
 
 AntManager::AntManager() {}
 
-void AntManager::spawnAnts(const Colony& colony, const float antSize)
+void AntManager::spawnAnts(const Colony &colony, const float antSize)
 {
     // Skip if ants are already initialized
-    if (!ants.empty()) {
+    if (!ants.empty())
         return;
-    }
 
-    const Point colonyPosition = colony.getPosition();
-    const float colonySize = colony.getSize();
+    const auto colonyPosition = colony.getPosition();
+    const auto colonySize = colony.getSize();
 
     // Generate possible spawn positions using a hexagonal grid
-    const std::vector<Point>& positions = generateHexGrid(colonyPosition, colonySize, antSize);
+    const auto &positions = generateHexGrid(colonyPosition, colonySize, antSize);
 
     // Calculate number of ants based on colony size
-    const int numAnts = static_cast<int>(std::floor(colonySize / antSize));
+    const auto numAnts = static_cast<int>(std::floor(colonySize / antSize));
 
     // Validate we have enough positions for all ants
-    if (positions.size() < numAnts) {
+    if (positions.size() < numAnts)
+    {
         std::cerr << "Error: Not enough positions to spawn all ants! "
                   << "Available: " << positions.size() << ", Required: " << numAnts << std::endl;
         return;
@@ -52,7 +53,8 @@ void AntManager::spawnAnts(const Colony& colony, const float antSize)
 
     // Create ants at the selected positions
     ants.reserve(numAnts);
-    for (int i = 0; i < numAnts; i++) {
+    for (auto i = 0; i < numAnts; i++)
+    {
         ants.emplace_back(shuffledPositions[i], antSize);
     }
 }
@@ -66,32 +68,32 @@ std::vector<Point> AntManager::generateHexGrid(Point center, float radius, float
 
     // Calculate hexagon side length from cellSize (inradius)
     // Inradius = (sqrt(3) / 2) * side_length, so side_length = (2 * inradius) / sqrt(3)
-    const auto size = (2.0f * cellSize) / sqrt3;
+    const auto hexSideLength = (2.0f * cellSize) / sqrt3;
 
     // Compute range for axial coordinate q based on circle radius and hexagon size
     // Adjust range to ensure hexagons fit within the circle without excess
-    auto N_q = static_cast<int>(std::ceil((radius - size) / (size * sqrt3)));
+    auto gridWidth = static_cast<int>(std::ceil((radius - hexSideLength) / (hexSideLength * sqrt3)));
     // Compute range for axial coordinate r
-    auto N_r = static_cast<int>(std::ceil((radius - size) / (size * 1.5f)));
+    auto gridHeight = static_cast<int>(std::ceil((radius - hexSideLength) / (hexSideLength * 1.5f)));
 
     // Iterate over axial coordinates (q, r) to generate hexagon centers
-    for (auto q = -N_q; q <= N_q; ++q)
+    for (auto q = -gridWidth; q <= gridWidth; ++q)
     {
-        for (auto r = -N_r; r <= N_r; ++r)
+        for (auto r = -gridHeight; r <= gridHeight; ++r)
         {
             // Calculate Cartesian x-coordinate for hexagon center
-            // Distance between adjacent centers (horizontally) is sqrt(3) * size = 2 * cellSize
-            auto x = size * sqrt3 * (q + r / 2.0);
+            // Distance between adjacent centers (horizontally) is sqrt(3) * hexSideLength = 2 * cellSize
+            auto x = hexSideLength * sqrt3 * (q + r / 2.0);
             // Calculate Cartesian y-coordinate for hexagon center
-            // Distance between rows (vertically) is (3/2) * size = sqrt(3) * cellSize
-            auto y = size * 1.5 * r;
+            // Distance between rows (vertically) is (3/2) * hexSideLength = sqrt(3) * cellSize
+            auto y = hexSideLength * 1.5 * r;
             // Compute distance from circle center to hexagon center
             auto dx = x - center.x;
             auto dy = y - center.y;
-            auto d = std::sqrt(dx * dx + dy * dy);
+            auto distance = std::sqrt(dx * dx + dy * dy);
             // Check if the entire hexagon fits within the circle
-            // Distance to vertex (size) plus center distance must be <= radius
-            if (d + size <= radius)
+            // Distance to vertex (hexSideLength) plus center distance must be <= radius
+            if (distance + hexSideLength <= radius)
             {
                 // Add valid hexagon center to positions
                 positions.push_back(Point(x, y));
@@ -149,17 +151,15 @@ bool AntManager::checkCollision(
     const float &rSize) const
 {
     const float distance = lCenter.distanceTo(rCenter);
-    const bool res = distance < (lSize + rSize);
-
-    return res;
+    return distance < (lSize + rSize);
 }
 
-Point AntManager::calcVelocityTowards(const Point &oldPostion, const Point &newPosition, const float strength)
+Point AntManager::calcVelocityTowards(const Point &oldPosition, const Point &newPosition, const float strength)
 {
-    auto dx = newPosition.x - oldPostion.x;
-    auto dy = newPosition.y - oldPostion.y;
+    auto dx = newPosition.x - oldPosition.x;
+    auto dy = newPosition.y - oldPosition.y;
 
-    const auto distance = oldPostion.distanceTo(newPosition);
+    const auto distance = oldPosition.distanceTo(newPosition);
 
     if (distance > 0.0f)
     {
@@ -172,18 +172,20 @@ Point AntManager::calcVelocityTowards(const Point &oldPostion, const Point &newP
 
 Point AntManager::calcRepulsion(const Ant &ant, size_t currentIndex)
 {
-    const auto collisionCoef = 1.5f;
-    const auto minSpacing = ant.getSize() * collisionCoef;
+    const auto minSpacing = ant.getSize() * COLLISION_COEF;
     const auto currentPosition = ant.getPosition();
     const auto currentVelocity = ant.getVelocity();
 
+    // Use static random generator for efficiency
     static std::random_device rd;
     static std::mt19937 gen(rd());
-    static std::uniform_real_distribution<float> dist(-0.025f, 0.025f);
+    static std::uniform_real_distribution<float> dist(-RANDOM_MOVEMENT, RANDOM_MOVEMENT);
 
+    // Initialize velocity and random components
     Point velocityComponent(0.0f, 0.0f);
     Point randomComponent(dist(gen), dist(gen));
 
+    // Calculate repulsion from each other ant
     for (auto i = 0; i < ants.size(); i++)
     {
         if (i == currentIndex)
@@ -196,7 +198,7 @@ Point AntManager::calcRepulsion(const Ant &ant, size_t currentIndex)
         auto dy = otherPosition.y - currentPosition.y;
         auto distance = currentPosition.distanceTo(otherPosition);
 
-        // **Apply repulsion ONLY if ant is getting closer**
+        // Apply repulsion ONLY if ant is getting closer to another ant
         auto futureDistance = (currentPosition + currentVelocity).distanceTo(otherPosition);
         if (distance < minSpacing && futureDistance < distance)
         {
@@ -206,28 +208,28 @@ Point AntManager::calcRepulsion(const Ant &ant, size_t currentIndex)
         }
     }
 
-    // Blend repulsion based on current velocity
+    // Blend repulsion based on current velocity magnitude
     auto velocityMagnitude = std::sqrt(currentVelocity.x * currentVelocity.x + currentVelocity.y * currentVelocity.y);
-    auto velocityInfluence = std::min(1.0f, velocityMagnitude / 0.1f); // Scale impact
+    auto velocityInfluence = std::min(1.0f, velocityMagnitude / VELOCITY_SCALING_THRESHOLD);
 
+    // Combine velocity-based repulsion with random movement
     auto totalRepulsion = (velocityComponent * velocityInfluence) + (randomComponent * (1.0f - velocityInfluence));
 
-    // **Normalize repulsion strength**
+    // Normalize repulsion strength if it exceeds maximum
     auto magnitude = std::sqrt(totalRepulsion.x * totalRepulsion.x + totalRepulsion.y * totalRepulsion.y);
-    if (magnitude > 0.2f)
+    if (magnitude > MAX_REPULSION_MAGNITUDE)
     {
-        totalRepulsion.x *= 0.1f / magnitude;
-        totalRepulsion.y *= 0.1f / magnitude;
+        totalRepulsion.x *= NORMALIZED_REPULSION_STRENGTH / magnitude;
+        totalRepulsion.y *= NORMALIZED_REPULSION_STRENGTH / magnitude;
     }
 
-    // Fine-tune the scaling
-    return totalRepulsion * 0.25f;
+    // Apply final scaling to repulsion force
+    return totalRepulsion * REPULSION_SCALING;
 }
 
-// Update ant movement
 void AntManager::updateAnt(const Colony &colony, std::vector<Food> &food, size_t currentIndex)
 {
-    const auto colonyPostion = colony.getPosition();
+    const auto colonyPosition = colony.getPosition();
     const auto colonySize = colony.getSize();
 
     auto &ant = ants[currentIndex];
@@ -238,7 +240,7 @@ void AntManager::updateAnt(const Colony &colony, std::vector<Food> &food, size_t
     // If carrying food, move toward colony
     if (ant.isBusy())
     {
-        const auto newVelocity = calcVelocityTowards(currentPosition, colonyPostion, 0.005f);
+        const auto newVelocity = calcVelocityTowards(currentPosition, colonyPosition, COLONY_TARGET_ATTRACTION);
         ant.setVelocity(newVelocity);
     }
 
@@ -246,71 +248,70 @@ void AntManager::updateAnt(const Colony &colony, std::vector<Food> &food, size_t
     {
         // Try moving with current velocity
         const auto newPosition = currentPosition + currentVelocity;
-        bool validPosition = !checkAntCollisions(newPosition, antSize, currentIndex) && checkViewportBoundaries(newPosition);
+        bool validPosition = !checkAntCollisions(newPosition, antSize, currentIndex) && 
+                             checkViewportBoundaries(newPosition);
 
         if (validPosition)
         {
-            // check food collision
+            // Check for food collision
             auto *collidedFood = checkFoodCollisions(newPosition, antSize, food);
             if (collidedFood && !ant.isBusy())
             {
-                // stop
-                ant.setVelocity(currentVelocity * 0.0f);
-
+                // Stop moving when food is found
+                ant.setVelocity(Point(0.0f, 0.0f));
+                
                 // Collect food
                 ant.biteFood(*collidedFood);
             }
 
-            // check colony collision
-            if (checkCollision(newPosition, colonyPostion, antSize, colonySize))
+            // Check for colony collision (to drop food)
+            if (checkCollision(newPosition, colonyPosition, antSize, colonySize))
             {
                 ant.dropFood();
             }
 
+            // Update position and return early
             ant.setPosition(newPosition);
             return;
         }
     }
 
-    Point newPosition;
-
-    // Try 10 times and stop trying
-    for (auto attempt = 0; attempt < 10; attempt++)
+    // If normal movement failed, try alternative positions with repulsion
+    for (auto attempt = 0; attempt < MAX_POSITION_ATTEMPTS; attempt++)
     {
-        auto validPosition = true;
-
-        // Move randomly avoiding ants
+        // Calculate repulsion to avoid other ants
         const auto repulsion = calcRepulsion(ant, currentIndex);
+        const auto newPosition = currentPosition + repulsion;
 
-        newPosition = currentPosition + repulsion;
+        // Check if this position is valid
+        auto validPosition = !checkAntCollisions(newPosition, antSize, currentIndex) && 
+                            checkViewportBoundaries(newPosition);
 
-        validPosition = !checkAntCollisions(newPosition, antSize, currentIndex) && checkViewportBoundaries(newPosition);
-
-        // Move
         if (validPosition)
         {
-            // check food collision
+            // Check for food interactions
             auto *collidedFood = checkFoodCollisions(newPosition, antSize, food);
             if (collidedFood && !ant.isBusy())
             {
-                // stop
-                ant.setVelocity(currentVelocity * 0.0f);
-
+                // Stop to collect food
+                ant.setVelocity(Point(0.0f, 0.0f));
+                
                 // Collect food
                 ant.biteFood(*collidedFood);
             }
             else
             {
-                // stop
+                // Set new velocity from repulsion
                 ant.setVelocity(repulsion);
             }
 
-            // check colony collision
-            if (checkCollision(newPosition, colonyPostion, antSize, colonySize))
+            // Check for colony interaction (to drop food)
+            if (checkCollision(newPosition, colonyPosition, antSize, colonySize))
             {
                 ant.dropFood();
             }
 
+            // Update position and break out of retry loop
             ant.setPosition(newPosition);
             break;
         }

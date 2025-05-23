@@ -4,17 +4,15 @@
 #include "colony.h"
 #include "foodManager.h"
 #include "antManager.hpp"
+#include "../render/frameContext.hpp"
 
 class Simulation
 {
 public:
     Simulation();
 
-    void update();
-
-    const Colony &getColony() const;
-    const FoodManager &getFoodManager() const;
-    const AntManager &getAntManager() const;
+    void update(AntColony::Render::FrameContext &ctx);
+    void render(AntColony::Render::FrameContext &ctx);
 
 private:
     Colony colony;
