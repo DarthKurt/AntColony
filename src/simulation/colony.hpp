@@ -1,18 +1,23 @@
 #pragma once
 
 #include "entity.hpp"
+#include "baseEntity.hpp"
+#include "../core/point.hpp"
 
 #include <GLFW/glfw3.h>
 #include <vector>
 
-class Colony : public Entity
+namespace AntColony::Simulation
 {
-public:
-    Colony(Point position, float size);
-    Colony(Point position, float size, unsigned int hexColor);
+    class Colony : public Entity, public BaseEntity
+    {
+    public:
+        Colony(Core::Point position, float size);
+        Colony(Core::Point position, float size, unsigned int hexColor);
 
-    void render(GLFWwindow *window) const override;
+        void render(GLFWwindow *window) const override;
 
-    Point getPosition() const override;
-    float getSize() const override;
-};
+        Core::Point getPosition() const override;
+        float getSize() const override;
+    };
+}

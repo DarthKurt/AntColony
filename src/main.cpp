@@ -3,15 +3,19 @@
 #include "render/renderEngines.hpp"
 #include "utils/randomGenerator.hpp"
 
+using AntColony::Render::initRenderContext;
+using AntColony::Utils::RandomGenerator;
+using AntColony::Simulation::Simulation;
+
 int main()
 {
-    auto renderCtx = AntColony::Render::initRenderContext(AntColony::Render::OPENGL);
+    auto renderCtx = initRenderContext(AntColony::Render::OPENGL);
 
     if (!renderCtx->getInited())
         return -1;
 
     // Initialize the random generator with time-based seed
-    AntColony::Utils::RandomGenerator::getInstance().seed();
+    RandomGenerator::getInstance().seed();
 
     Simulation simulation;
 

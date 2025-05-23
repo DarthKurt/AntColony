@@ -2,34 +2,38 @@
 
 #include "entity.hpp"
 #include "food.hpp"
+#include "../core/point.hpp"
 
 #include <GLFW/glfw3.h>
 #include <vector>
 
-class Ant : public Entity
+namespace AntColony::Simulation
 {
-public:
-    Ant(Point position, float size);
-    Ant(Point position, Point velocity, float size);
+    class Ant : public Entity, public BaseEntity
+    {
+    public:
+        Ant(Core::Point position, float size);
+        Ant(Core::Point position, Core::Point velocity, float size);
 
-    void render(GLFWwindow *window) const override;
+        void render(GLFWwindow *window) const override;
 
-    void biteFood(Food &food);
-    void dropFood();
+        void biteFood(Food &food);
+        void dropFood();
 
-    void setPosition(Point newPosition);
-    void setVelocity(Point newVelocity);
-    Point getVelocity() const;
+        void setPosition(Core::Point newPosition);
+        void setVelocity(Core::Point newVelocity);
+        Core::Point getVelocity() const;
 
-    bool isBusy() const;
-    bool isMoving() const;
+        bool isBusy() const;
+        bool isMoving() const;
 
-    Point getPosition() const override;
-    float getSize() const override;
+        Core::Point getPosition() const override;
+        float getSize() const override;
 
-private:
-    // Stores previous movement direction
-    Point velocity;
-    bool carryFood;
-};
+    private:
+        // Stores previous movement direction
+        Core::Point velocity;
+        bool carryFood;
+    };
 
+}

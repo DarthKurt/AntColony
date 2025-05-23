@@ -4,64 +4,71 @@
 
 #include <algorithm>
 
-FoodManager::FoodManager(Point colonyCenter, float colonyRadius) : colonyRadius(colonyRadius) {}
+using AntColony::Utils::LEFT_BOUNDARY;
+using AntColony::Utils::RIGHT_BOUNDARY;
 
-void FoodManager::spawnFood()
+namespace AntColony::Simulation
 {
-    const float foodSize = 0.05f;
-    const int maxCapacity = 1;
-    Point foodPosition;
+    FoodManager::FoodManager(Core::Point colonyCenter, float colonyRadius) : colonyRadius(colonyRadius) {}
 
-    float x, y;
-    x = getCoordInBoundaries(colonyRadius, foodSize);
-    y = getCoordInBoundaries(colonyRadius, foodSize);
-
-    foodPosition = Point(x, y);
-    foodParticles.emplace_back(foodPosition, foodSize, maxCapacity);
-}
-
-float FoodManager::getCoordInBoundaries(float innerSpot, float itemSize)
-{
-    auto& random = AntColony::Utils::RandomGenerator::getInstance();
-    
-    // Decide randomly whether to spawn food on the left or right side
-    if (random.getBool())
+    void FoodManager::spawnFood()
     {
-        return LEFT_BOUNDARY + itemSize + random.getFloat(0.0f, 1.0f) * (innerSpot - itemSize);
+        const float foodSize = 0.05f;
+        const int maxCapacity = 1;
+        Core::Point foodPosition;
+
+        float x, y;
+        x = getCoordInBoundaries(colonyRadius, foodSize);
+        y = getCoordInBoundaries(colonyRadius, foodSize);
+
+        foodPosition = Core::Point(x, y);
+        foodParticles.emplace_back(foodPosition, foodSize, maxCapacity);
     }
-    else
+
+    float FoodManager::getCoordInBoundaries(float innerSpot, float itemSize)
     {
-        return innerSpot + itemSize + random.getFloat(0.0f, 1.0f) * (RIGHT_BOUNDARY - itemSize - innerSpot);
+        auto &random = AntColony::Utils::RandomGenerator::getInstance();
+
+        // Decide randomly whether to spawn food on the left or right side
+        if (random.getBool())
+        {
+            return LEFT_BOUNDARY + itemSize + random.getFloat(0.0f, 1.0f) * (innerSpot - itemSize);
+        }
+        else
+        {
+            return innerSpot + itemSize + random.getFloat(0.0f, 1.0f) * (RIGHT_BOUNDARY - itemSize - innerSpot);
+        }
     }
-}
 
-void FoodManager::removeDepletedFood()
-{
-    foodParticles.erase(
-        std::remove_if(foodParticles.begin(), foodParticles.end(),
-                       [](const Food &food)
-                       { return food.getCapacity() <= 0; }),
-        foodParticles.end());
-}
+    void FoodManager::removeDepletedFood()
+    {
+        foodParticles.erase(
+            std::remove_if(foodParticles.begin(), foodParticles.end(),
+                           [](const Food &food)
+                           { return food.getCapacity() <= 0; }),
+            foodParticles.end());
+    }
 
-void FoodManager::update()
-{
-    auto& random = AntColony::Utils::RandomGenerator::getInstance();
-    
-    // Random chance per cycle to spawn new food (0.4% chance)
-    if (random.getInt(0, 249) == 0)
-        spawnFood();
+    void FoodManager::update()
+    {
+        auto &random = AntColony::Utils::RandomGenerator::getInstance();
 
-    removeDepletedFood();
-}
+        // Random chance per cycle to spawn new food (0.4% chance)
+        if (random.getInt(0, 249) == 0)
+            spawnFood();
 
-void FoodManager::render(GLFWwindow *window) const
-{
-    for (const Food &food : foodParticles)
-        food.render(window);
-}
+        removeDepletedFood();
+    }
 
-std::vector<Food> &FoodManager::getFoodParticles()
-{
-    return foodParticles;
+    void FoodManager::render(GLFWwindow *window) const
+    {
+        for (const Food &food : foodParticles)
+            food.render(window);
+    }
+
+    std::vector<Food> &FoodManager::getFoodParticles()
+    {
+        return foodParticles;
+    }
+
 }

@@ -1,20 +1,26 @@
 #include "food.hpp"
+#include "baseEntity.hpp"
+#include "../core/point.hpp"
 
-Food::Food(Point position, float size, int capacity) : Entity(position, 0x387d27, size), capacity(capacity) {}
-
-void Food::bite()
+namespace AntColony::Simulation
 {
-    if (capacity > 0)
+    Food::Food(Core::Point position, float size, int capacity)
+        : BaseEntity(position, 0x387d27, size), capacity(capacity) {}
+
+    void Food::bite()
     {
-        capacity -= 1;
+        if (capacity > 0)
+        {
+            capacity -= 1;
+        }
     }
-}
 
-void Food::render(GLFWwindow *window) const
-{
-    drawCircleInPosition(mainColor, entitySize, window);
-}
+    void Food::render(GLFWwindow *window) const
+    {
+        drawCircleInPosition(mainColor, entitySize, window);
+    }
 
-Point Food::getPosition() const { return position; }
-int Food::getCapacity() const { return capacity; }
-float Food::getSize() const { return entitySize; }
+    Core::Point Food::getPosition() const { return position; }
+    int Food::getCapacity() const { return capacity; }
+    float Food::getSize() const { return entitySize; }
+}

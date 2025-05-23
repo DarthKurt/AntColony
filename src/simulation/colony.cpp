@@ -1,20 +1,22 @@
 #include "colony.hpp"
+#include "baseEntity.hpp"
+#include "../core/point.hpp"
+
 #include "../utils/viewPort.hpp"
 
-Colony::Colony(Point position, float size)
-    : Entity(position, 0x7d4827, size)
+namespace AntColony::Simulation
 {
-}
+    Colony::Colony(Core::Point position, float size)
+        : BaseEntity(position, 0x7d4827, size) {}
 
-Colony::Colony(Point position, float size, unsigned int hexColor)
-    : Entity(position, hexColor, size)
-{
-}
+    Colony::Colony(Core::Point position, float size, unsigned int hexColor)
+        : BaseEntity(position, hexColor, size) {}
 
-void Colony::render(GLFWwindow *window) const
-{
-    drawCircleInPosition(mainColor, entitySize, window);
-}
+    void Colony::render(GLFWwindow *window) const
+    {
+        drawCircleInPosition(mainColor, entitySize, window);
+    }
 
-Point Colony::getPosition() const { return position; }
-float Colony::getSize() const { return entitySize; }
+    Core::Point Colony::getPosition() const { return position; }
+    float Colony::getSize() const { return entitySize; }
+}

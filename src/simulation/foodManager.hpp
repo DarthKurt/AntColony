@@ -1,23 +1,26 @@
-#pragma once 
+#pragma once
 
 #include "food.hpp"
 #include <vector>
 
-class FoodManager
+namespace AntColony::Simulation
 {
-public:
-    FoodManager(Point colonyCenter, float colonyRadius);
+    class FoodManager
+    {
+    public:
+        FoodManager(Core::Point colonyCenter, float colonyRadius);
 
-    void update();
-    void render(GLFWwindow *window) const;
+        void update();
+        void render(GLFWwindow *window) const;
 
-    std::vector<Food>& getFoodParticles();
+        std::vector<Food> &getFoodParticles();
 
-private:
-    float colonyRadius;
-    void spawnFood();
-    void removeDepletedFood();
-    static float getCoordInBoundaries(float innerSpot, float itemSize);
-    
-    std::vector<Food> foodParticles;
-};
+    private:
+        float colonyRadius;
+        void spawnFood();
+        void removeDepletedFood();
+        static float getCoordInBoundaries(float innerSpot, float itemSize);
+
+        std::vector<Food> foodParticles;
+    };
+}
