@@ -18,7 +18,6 @@ public:
     float getSize() const override;
 
 private:
-    float size;
     int capacity;
 };
 

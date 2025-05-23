@@ -15,7 +15,6 @@ void Entity::drawCircleInPosition(unsigned int hexColor, float size, GLFWwindow 
 
     // Assume orthographic projection maps height to [-1, 1] (2 units total)
     // Adjust size from pixel-based fraction to coordinate units
-    float coordinateHeight = 2.0f; // Default: height spans 2 units (e.g., [-1, 1])
     float minDimension = std::min(width, height);
     float pixelSize = size * minDimension;         // Size as fraction of viewport height in pixels
     float scaledSize = (pixelSize / minDimension); // Convert to coordinate units

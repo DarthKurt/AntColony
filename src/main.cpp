@@ -4,7 +4,7 @@
 #include <thread>
 #include <iostream>
 
-void framebuffer_size_callback(GLFWwindow *window, int width, int height)
+void framebufferSizeCallback(GLFWwindow *window, int width, int height)
 {
     float aspectRatio = (float)width / (float)height;
     glMatrixMode(GL_PROJECTION);
@@ -30,7 +30,7 @@ GLFWwindow *initUI()
     }
 
     glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
     return window;
 }
 
@@ -51,9 +51,9 @@ void render(GLFWwindow *window, const Simulation &simulation)
     glfwPollEvents();
 }
 
-void controlFrameRate(const std::__1::chrono::steady_clock::time_point &startTime, const float targetFrameTimeMs)
+void controlFrameRate(const std::chrono::steady_clock::time_point &startTime, const float targetFrameTimeMs)
 {
-    auto endTime = std::chrono::high_resolution_clock::now();
+    auto endTime = std::chrono::steady_clock::now();
     auto frameDuration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
     if (frameDuration.count() < targetFrameTimeMs)
     {
@@ -78,7 +78,7 @@ int main()
 
     while (!glfwWindowShouldClose(window))
     {
-        auto startTime = std::chrono::high_resolution_clock::now();
+        auto startTime = std::chrono::steady_clock::now();
 
         simulation.update();
 

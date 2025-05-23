@@ -7,7 +7,7 @@ struct Point
 {
     float x, y;
 
-    Point() = default;
+    Point() : x(0), y(0) {}
     Point(float x, float y) : x(x), y(y) {}
 
     Point operator+(const Point &other) const

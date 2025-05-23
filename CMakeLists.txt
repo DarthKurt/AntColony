@@ -3,6 +3,14 @@ project(AntColonySim)
 
 set(CMAKE_CXX_STANDARD 11)
 
+find_program(CPP_CHECK NAMES cppcheck)
+if(CPP_CHECK)
+    add_custom_target(run_cppcheck
+        COMMAND ${CPP_CHECK} --enable=all --inconclusive --force ${CMAKE_SOURCE_DIR}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    )
+endif()
+
 # Добавляем исходники
 file(GLOB SIMULATION_SOURCES "src/**/*.[c,h]pp")
 add_executable(AntColonySim "src/main.cpp" ${SIMULATION_SOURCES})

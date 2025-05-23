@@ -11,7 +11,5 @@ void setColor(const unsigned int hexColor)
 
 bool checkViewportBoundaries(const Point &newPosition)
 {
-    bool valid = true;
-
     return LEFT_BOUNDARY < newPosition.x && newPosition.x < RIGHT_BOUNDARY && LEFT_BOUNDARY < newPosition.y && newPosition.y < RIGHT_BOUNDARY;
 }
