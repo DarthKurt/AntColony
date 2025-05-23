@@ -1,13 +1,13 @@
 #include "../core/logger.hpp"
 #include "../utils/viewPort.hpp"
 #include "../utils/consoleLogger.hpp"
+#include "../utils/randomGenerator.hpp"
 
 #include "antManager.hpp"
 
 #include <algorithm>
 #include <cmath>
 #include <iostream>
-#include <random>
 #include <vector>
 #include <memory>
 
@@ -60,9 +60,16 @@ void AntManager::spawnAnts(const Colony &colony, const float antSize)
 
     // Randomly distribute ants across available positions
     std::vector<Point> shuffledPositions = positions;
-    std::random_device rd;
-    std::mt19937 rng(rd());
-    std::shuffle(shuffledPositions.begin(), shuffledPositions.end(), rng);
+
+    // Use the RandomGenerator to shuffle the positions
+    auto &random = AntColony::Utils::RandomGenerator::getInstance();
+
+    // Fisher-Yates shuffle algorithm
+    for (size_t i = shuffledPositions.size() - 1; i > 0; --i)
+    {
+        size_t j = random.getInt(0, i);
+        std::swap(shuffledPositions[i], shuffledPositions[j]);
+    }
 
     // Create ants at the selected positions
     ants.reserve(numAnts);
@@ -189,14 +196,14 @@ Point AntManager::calcRepulsion(const Ant &ant, size_t currentIndex) const
     const auto currentPosition = ant.getPosition();
     const auto currentVelocity = ant.getVelocity();
 
-    // Use static random generator for efficiency
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    static std::uniform_real_distribution<float> dist(-RANDOM_MOVEMENT, RANDOM_MOVEMENT);
+    // Use RandomGenerator singleton instead of static random device
+    auto &random = AntColony::Utils::RandomGenerator::getInstance();
 
     // Initialize velocity and random components
     Point velocityComponent(0.0f, 0.0f);
-    Point randomComponent(dist(gen), dist(gen));
+    Point randomComponent(
+        random.getFloat(-RANDOM_MOVEMENT, RANDOM_MOVEMENT),
+        random.getFloat(-RANDOM_MOVEMENT, RANDOM_MOVEMENT));
 
     // Calculate repulsion from each other ant
     for (auto i = 0; i < ants.size(); i++)

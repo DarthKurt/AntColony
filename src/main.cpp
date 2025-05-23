@@ -1,6 +1,7 @@
 #include "simulation/simulation.hpp"
 #include "render/render.hpp"
 #include "render/renderEngines.hpp"
+#include "utils/randomGenerator.hpp"
 
 int main()
 {
@@ -9,8 +10,8 @@ int main()
     if (!renderCtx->getInited())
         return -1;
 
-    // Seed randomizer
-    srand(static_cast<unsigned>(time(nullptr)));
+    // Initialize the random generator with time-based seed
+    AntColony::Utils::RandomGenerator::getInstance().seed();
 
     Simulation simulation;
 

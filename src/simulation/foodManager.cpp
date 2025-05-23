@@ -1,5 +1,6 @@
 #include "foodManager.hpp"
 #include "../utils/viewPort.hpp"
+#include "../utils/randomGenerator.hpp"
 
 #include <algorithm>
 
@@ -8,7 +9,7 @@ FoodManager::FoodManager(Point colonyCenter, float colonyRadius) : colonyRadius(
 void FoodManager::spawnFood()
 {
     const float foodSize = 0.05f;
-    const int maxCapacity = 5;
+    const int maxCapacity = 1;
     Point foodPosition;
 
     float x, y;
@@ -21,14 +22,16 @@ void FoodManager::spawnFood()
 
 float FoodManager::getCoordInBoundaries(float innerSpot, float itemSize)
 {
+    auto& random = AntColony::Utils::RandomGenerator::getInstance();
+    
     // Decide randomly whether to spawn food on the left or right side
-    if (rand() % 2 == 0)
+    if (random.getBool())
     {
-        return LEFT_BOUNDARY + itemSize + ((static_cast<float>(rand()) / RAND_MAX) * (innerSpot - itemSize));
+        return LEFT_BOUNDARY + itemSize + random.getFloat(0.0f, 1.0f) * (innerSpot - itemSize);
     }
     else
     {
-        return innerSpot + itemSize + ((static_cast<float>(rand()) / RAND_MAX) * (RIGHT_BOUNDARY - itemSize - innerSpot));
+        return innerSpot + itemSize + random.getFloat(0.0f, 1.0f) * (RIGHT_BOUNDARY - itemSize - innerSpot);
     }
 }
 
@@ -43,8 +46,10 @@ void FoodManager::removeDepletedFood()
 
 void FoodManager::update()
 {
-    // Random chance per cycle to spawn new food
-    if (rand() % 250 == 0)
+    auto& random = AntColony::Utils::RandomGenerator::getInstance();
+    
+    // Random chance per cycle to spawn new food (0.4% chance)
+    if (random.getInt(0, 249) == 0)
         spawnFood();
 
     removeDepletedFood();
