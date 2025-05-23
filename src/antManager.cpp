@@ -176,7 +176,7 @@ Point AntManager::calcRepulsion(const Ant &ant, size_t currentIndex)
     const float collisionCoef = 1.5f;
     const float minSpacing = ant.getSize() * collisionCoef;
     const Point currentPosition = ant.getPosition();
-    const Point currentVelocity = ant.getPosition();
+    const Point currentVelocity = ant.getVelocity();
 
     static std::random_device rd;
     static std::mt19937 gen(rd());
@@ -233,7 +233,7 @@ void AntManager::updateAnt(const Colony &colony, std::vector<Food> &food, size_t
 
     Ant &ant = ants[currentIndex];
     const Point currentVelocity = ant.getVelocity();
-    const Point currentPosition = ant.getVelocity();
+    const Point currentPosition = ant.getPosition();
     const float antSize = ant.getSize();
 
     // If carrying food, move toward colony
