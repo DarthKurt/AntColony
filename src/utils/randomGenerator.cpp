@@ -30,11 +30,4 @@ namespace AntColony::Utils
         std::uniform_real_distribution<float> dist(min, max);
         return dist(engine);
     }
-
-    bool RandomGenerator::getBool(float probability)
-    {
-        std::bernoulli_distribution dist(probability);
-        return dist(engine);
-    }
-
 }

@@ -1,4 +1,5 @@
 #include "foodManager.hpp"
+#include "../utils/consoleLogger.hpp"
 #include "../utils/randomGenerator.hpp"
 
 #include <algorithm>
@@ -7,54 +8,67 @@
 namespace AntColony::Simulation
 {
     FoodManager::FoodManager(Core::Point colonyCenter, float colonyRadius, float foodRadius, Core::ViewPort viewPort)
-        : colonyCenter(colonyCenter), colonyRadius(colonyRadius), foodRadius(foodRadius), viewPort(viewPort) {}
+        : BaseEntityManager(std::make_shared<Utils::ConsoleLogger>()), colonyCenter(colonyCenter), colonyRadius(colonyRadius), foodRadius(foodRadius), viewPort(viewPort) {}
 
     void FoodManager::spawnFood()
     {
-        auto &random = AntColony::Utils::RandomGenerator::getInstance();
+        const bool shouldProfile = true;
 
+        // Time the update operations
+        const std::chrono::steady_clock::time_point startTime = std::chrono::high_resolution_clock::now();
+        debug(shouldProfile ? &startTime : nullptr, "Spawn new food");
+
+        auto &random = AntColony::Utils::RandomGenerator::getInstance();
         const auto maxCapacity = random.getInt(1, 3);
 
-        // Generate a random angle (0 to 2π)
-        const auto angle = random.getFloat(0, 2 * M_PI);
+        // Pre-calculate viewport distances from colony
+        const float distToRight = viewPort.maxX - colonyCenter.x - foodRadius;
+        const float distToLeft = colonyCenter.x - viewPort.minX - foodRadius;
+        const float distToTop = viewPort.maxY - colonyCenter.y - foodRadius;
+        const float distToBottom = colonyCenter.y - viewPort.minY - foodRadius;
 
-        // Calculate direction vector
-        const auto dx = std::cos(angle);
-        const auto dy = std::sin(angle);
+        // Generate position using simplified logic
+        float x, y;
 
-        // Calculate distance to viewport boundaries in this direction
-        float distToEdge;
-        if (std::abs(dx) < 0.0001f)
+        // First determine which quadrant to place food in
+        auto quadrant = random.getInt(0, 3);
+        auto angleMin = quadrant * M_PI_2;
+        auto angleMax = angleMin + M_PI_2;
+
+        debug(shouldProfile ? &startTime : nullptr, "Spawn in quadrant: " + std::to_string(quadrant) +
+                                                        ". Min angle: " + std::to_string(angleMin) +
+                                                        ". Max angle: " + std::to_string(angleMax));
+
+        float angle = random.getFloat(angleMin, angleMax);
+
+        debug(shouldProfile ? &startTime : nullptr, "Selected angle: " + std::to_string(angle));
+
+        // Use angle to determine max distance in that direction
+        float dx = std::cos(angle);
+        float dy = std::sin(angle);
+
+        // Fast approximation to find distance to edge
+        float maxDist;
+        if (dx > 0)
         {
-            // Vertical direction
-            distToEdge = (dy > 0) ? (viewPort.maxY - colonyCenter.y) : (colonyCenter.y - viewPort.minY);
-        }
-        else if (std::abs(dy) < 0.0001f)
-        {
-            // Horizontal direction
-            distToEdge = (dx > 0) ? (viewPort.maxX - colonyCenter.x) : (colonyCenter.x - viewPort.minX);
+            maxDist = (dy > 0)
+                          ? std::min(distToRight / dx, distToTop / dy)
+                          : std::min(distToRight / dx, distToBottom / -dy);
         }
         else
         {
-            // Diagonal direction - find which boundary we hit first
-            auto tx1 = (viewPort.minX - colonyCenter.x) / dx;
-            auto tx2 = (viewPort.maxX - colonyCenter.x) / dx;
-            auto ty1 = (viewPort.minY - colonyCenter.y) / dy;
-            auto ty2 = (viewPort.maxY - colonyCenter.y) / dy;
-
-            // Consider only positive distances
-            auto tx = (dx > 0) ? tx2 : tx1;
-            auto ty = (dy > 0) ? ty2 : ty1;
-
-            distToEdge = std::min(std::abs(tx), std::abs(ty));
+            maxDist = (dy > 0)
+                          ? std::min(distToLeft / -dx, distToTop / dy)
+                          : std::min(distToLeft / -dx, distToBottom / -dy);
         }
 
-        // Choose random distance between colony radius and edge (with buffer for food size)
-        auto distance = random.getFloat(colonyRadius + foodRadius, distToEdge - foodRadius);
+        // Generate actual distance
+        float distance = random.getFloat(colonyRadius + foodRadius, maxDist);
+        debug(shouldProfile ? &startTime : nullptr, "Selected distance: " + std::to_string(distance));
 
-        // Calculate final position
-        auto x = colonyCenter.x + distance * dx;
-        auto y = colonyCenter.y + distance * dy;
+        // Calculate position
+        x = colonyCenter.x + distance * dx;
+        y = colonyCenter.y + distance * dy;
 
         foodParticles.emplace_back(Core::Point(x, y), foodRadius, maxCapacity);
     }

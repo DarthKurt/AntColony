@@ -3,6 +3,7 @@
 #include "ant.hpp"
 #include "colony.hpp"
 #include "food.hpp"
+#include "baseEntityManager.hpp"
 
 #include "../core/logger.hpp"
 #include "../core/viewPort.hpp"
@@ -20,13 +21,13 @@ namespace AntColony::Simulation
      * It handles ant spawning, movement, collision detection, and interactions
      * with food and the colony.
      */
-    class AntManager
+    class AntManager : public BaseEntityManager
     {
     public:
         /**
          * @brief Default constructor
          */
-        AntManager(Core::ViewPort viewPort);
+        explicit AntManager(Core::ViewPort viewPort);
 
         /**
          * @brief Constructor with custom logger
@@ -58,11 +59,6 @@ namespace AntColony::Simulation
          * @brief Stores all ants in the simulation
          */
         std::vector<Ant> ants;
-
-        /**
-         * @brief Stores logger utility
-         */
-        std::shared_ptr<Core::Logger> logger;
 
         /**
          * @brief Stores viewport

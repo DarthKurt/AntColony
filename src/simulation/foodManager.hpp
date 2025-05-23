@@ -1,12 +1,16 @@
 #pragma once
 
+#include "baseEntityManager.hpp"
 #include "food.hpp"
+#include "../core/logger.hpp"
 #include "../core/viewPort.hpp"
+
 #include <vector>
+#include <memory>
 
 namespace AntColony::Simulation
 {
-    class FoodManager
+    class FoodManager : public BaseEntityManager
     {
     public:
         FoodManager(Core::Point colonyCenter, float colonyRadius, float foodRadius, Core::ViewPort viewPort);
@@ -26,5 +30,7 @@ namespace AntColony::Simulation
         void removeDepletedFood();
 
         std::vector<Food> foodParticles;
+
+
     };
 }

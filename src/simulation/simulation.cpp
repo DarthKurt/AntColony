@@ -20,7 +20,7 @@ namespace AntColony::Simulation
               ANT_SIZE) {}
 
     Simulation::Simulation(Core::ViewPort viewPort, Core::Point colonyCenter, float colonySize, float foodSize, float antSize)
-        : colony(colonyCenter, colonySize), antManager(viewPort), foodManager(colonyCenter, colonySize, foodSize, viewPort)
+        : colony(colonyCenter, colonySize), foodManager(colonyCenter, colonySize, foodSize, viewPort), antManager(viewPort)
     {
         antManager.spawnAnts(colony, antSize);
     }

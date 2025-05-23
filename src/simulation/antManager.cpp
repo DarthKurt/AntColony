@@ -24,7 +24,7 @@ namespace AntColony::Simulation
         : AntManager(std::make_shared<Utils::ConsoleLogger>(), viewPort) {}
 
     AntManager::AntManager(std::shared_ptr<Core::Logger> logger, Core::ViewPort viewPort)
-        : logger(logger), viewPort(viewPort) {}
+        : BaseEntityManager(logger), viewPort(viewPort) {}
 
     void AntManager::spawnAnts(const Colony &colony, const float antSize)
     {

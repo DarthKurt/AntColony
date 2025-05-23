@@ -87,11 +87,11 @@ TEST_CASE("FoodManager distributes food particles evenly", "[foodmanager]")
 {
     // Set up parameters for the test
     Point colonyCenter(0.0f, 0.0f);
-    float colonyRadius = 50.0f;
-    float foodRadius = 5.0f;
+    float colonyRadius = 5.0f;
+    float foodRadius = 0.5f;
 
     // Create food manager
-    FoodManager foodManager(colonyCenter, colonyRadius, foodRadius, AntColony::Core::ViewPort(-100.0f, -100.0f, 100.0f, 100.0f));
+    FoodManager foodManager(colonyCenter, colonyRadius, foodRadius, AntColony::Core::ViewPort(-10.0f, -10.0f, 10.0f, 10.0f));
 
     // Generate a large number of food particles to ensure statistical significance
     const int numFrameCycles = 1000000;
