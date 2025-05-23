@@ -29,20 +29,6 @@ public:
     float getSize() const override;
 
 private:
-    /**
-     * @brief Computes a repulsion force to react on collisions with nearby entities.
-     *
-     * This function analyzes all ants in the given vector and determines if the
-     * current ant is too close to others. If the distance between ants falls below
-     * the collision threshold, a repulsion force is calculated to push the ant away.
-     * The force is scaled based on proximity, ensuring a smooth and realistic movement.
-     *
-     * @param ants Vector containing all ants in the simulation.
-     * @param currentIndex Index of the Ant in the provided vector.
-     * @return Point representing the computed repulsion force to adjust the ant's movement.
-     */
-    // Point getRepulsion(const std::vector<Ant> &ants, size_t currentIndex);
-
     // Stores previous movement direction
     Point velocity;
     bool carryFood;

@@ -29,7 +29,21 @@ private:
     bool checkAntCollisions(const Point &, float, size_t);
     Food *checkFoodCollisions(const Point &, float, std::vector<Food> &);
     Point calcVelocityTowards(const Point &, const Point &, float);
+
+    /**
+     * @brief Computes a repulsion force to react on collisions with nearby entities.
+     *
+     * This function analyzes all ants in the given vector and determines if the
+     * current ant is too close to others. If the distance between ants falls below
+     * the collision threshold, a repulsion force is calculated to push the ant away.
+     * The force is scaled based on proximity, ensuring a smooth and realistic movement.
+     *
+     * @param ants Vector containing all ants in the simulation.
+     * @param currentIndex Index of the Ant in the provided vector.
+     * @return Point representing the computed repulsion force to adjust the ant's movement.
+     */
     Point calcRepulsion(const Ant &, size_t);
+
     void updateAnt(const Colony &, std::vector<Food> &, size_t);
 
     bool checkCollision(
