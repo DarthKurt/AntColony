@@ -46,7 +46,7 @@ namespace AntColony::Simulation
          * @param colony The colony that ants interact with
          * @param food Vector of food sources that ants can interact with
          */
-        void update(const Colony &colony, std::vector<Food> &food);
+        void update(const Colony &colony, const std::vector<Food *> &food);
 
         /**
          * @brief Renders all ants to the window
@@ -91,7 +91,7 @@ namespace AntColony::Simulation
          * @param food Vector of food sources to check against
          * @return Pointer to collided food or nullptr if no collision
          */
-        static Food *checkFoodCollisions(const Core::Point &newPosition, float antSize, std::vector<Food> &food);
+        static Food *checkFoodCollisions(const Core::Point &newPosition, float antSize, const std::vector<Food *> &food);
 
         /**
          * @brief Calculates velocity vector towards a target
@@ -116,7 +116,7 @@ namespace AntColony::Simulation
          * @param food Vector of food sources
          * @param currentIndex Index of the ant to update
          */
-        void updateAnt(const Colony &colony, std::vector<Food> &food, size_t currentIndex);
+        void updateAnt(const Colony &colony, std::vector<Food *> food, size_t currentIndex);
 
         /**
          * @brief Checks if two circles collide

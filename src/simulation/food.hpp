@@ -5,14 +5,16 @@
 
 #include "../core/point.hpp"
 
+#include <functional>
+
 namespace AntColony::Simulation
 {
     class Food : public Entity, public BaseEntity
     {
     public:
-        Food(Core::Point position, float size, int capacity);
+        Food(Core::Point position, float size, int capacity, std::function<void(Food*)> onEmpty);
 
-        void bite();
+        void take();
         void render(const Render::Renderer &renderer) const override;
 
         int getCapacity() const;
@@ -21,5 +23,10 @@ namespace AntColony::Simulation
 
     private:
         int capacity;
+
+        /**
+         * @brief Is called when food spot is empty
+         */
+        std::function<void(Food*)> onEmpty;
     };
 }

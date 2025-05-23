@@ -101,7 +101,7 @@ TEST_CASE("FoodManager distributes food particles evenly", "[foodmanager]")
     }
 
     // Get the generated food particles
-    const std::vector<Food> &foodParticles = foodManager.getFoodParticles();
+    const auto &foodParticles = foodManager.getFoodParticles();
 
     // Define grid size for analyzing distribution
     float gridSize = 5.0f; // Adjust based on the expected density
@@ -117,7 +117,7 @@ TEST_CASE("FoodManager distributes food particles evenly", "[foodmanager]")
     // Add all food particles to the analyzer
     for (const auto &food : foodParticles)
     {
-        analyzer.addPoint(food.getPosition().x, food.getPosition().y);
+        analyzer.addPoint(food->getPosition().x, food->getPosition().y);
     }
 
     // Optional: Print the distribution for visual debugging
@@ -135,9 +135,9 @@ TEST_CASE("FoodManager distributes food particles evenly", "[foodmanager]")
     REQUIRE(coeffOfVariation < 0.5); // This is an example threshold, adjust as needed
 
     // Additionally, check that food particles are outside the colony
-    for (const auto &food : foodParticles)
+    for (const auto food : foodParticles)
     {
-        Point foodPos = food.getPosition();
+        Point foodPos = food->getPosition();
         float distanceFromColony = std::sqrt(
             std::pow(foodPos.x - colonyCenter.x, 2) +
             std::pow(foodPos.y - colonyCenter.y, 2));

@@ -10,7 +10,7 @@ namespace AntColony::Simulation
         if (startTime)
         {
             const auto current = std::chrono::high_resolution_clock::now();
-            const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(current - *startTime).count();
+            const auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(current - *startTime).count();
 
             logger->debug("[" + std::to_string(elapsed) + "] " + message);
         }

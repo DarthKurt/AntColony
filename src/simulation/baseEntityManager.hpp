@@ -14,7 +14,7 @@ namespace AntColony::Simulation
         virtual ~BaseEntityManager() {}
 
     protected:
-        BaseEntityManager(std::shared_ptr<Core::Logger> logger);
+        explicit BaseEntityManager(std::shared_ptr<Core::Logger> logger);
 
         virtual void debug(const std::chrono::steady_clock::time_point *startTime, const std::string &message);
 

@@ -14,7 +14,7 @@ namespace AntColony::Simulation
 
         void render(const Render::Renderer &renderer) const override;
 
-        void biteFood(Food &food);
+        void biteFood(Food *food);
         void dropFood();
 
         void setPosition(Core::Point newPosition);

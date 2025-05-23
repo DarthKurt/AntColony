@@ -13,7 +13,7 @@ namespace AntColony::Simulation
     public:
         Simulation();
 
-        void update(Render::FrameContext &ctx);
+        void update(const Render::FrameContext &ctx);
         void render(const Render::FrameContext &ctx) const;
 
     private:

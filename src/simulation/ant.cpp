@@ -8,10 +8,10 @@ namespace AntColony::Simulation
     Ant::Ant(Core::Point position, Core::Point velocity, float size)
         : BaseEntity(position, 0xfc6203, size), velocity(velocity), carryFood(false) {}
 
-    void Ant::biteFood(Food &food)
+    void Ant::biteFood(Food *food)
     {
         // Reduce food capacity
-        food.bite();
+        food->take();
         carryFood = true;
     }
 

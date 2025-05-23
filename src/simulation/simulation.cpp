@@ -25,9 +25,9 @@ namespace AntColony::Simulation
         antManager.spawnAnts(colony, antSize);
     }
 
-    void Simulation::update(Render::FrameContext &ctx)
+    void Simulation::update(const Render::FrameContext &ctx)
     {
-        std::vector<Food> &food = foodManager.getFoodParticles();
+        const auto &food = foodManager.getFoodParticles();
         antManager.update(colony, food);
         foodManager.update();
     }
