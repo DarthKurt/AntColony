@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(AntColonySim)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 find_program(CPP_CHECK NAMES cppcheck)
 if(CPP_CHECK)
@@ -11,9 +11,9 @@ if(CPP_CHECK)
     )
 endif()
 
-# Добавляем исходники
-file(GLOB SIMULATION_SOURCES "src/**/*.[c,h]pp")
-add_executable(AntColonySim "src/main.cpp" ${SIMULATION_SOURCES})
+# Add sources
+file(GLOB_RECURSE SIMULATION_SOURCES "src/*.cpp")
+add_executable(AntColonySim "${SIMULATION_SOURCES}")
 
 # Находим GLFW через pkg-config
 find_package(PkgConfig REQUIRED)
