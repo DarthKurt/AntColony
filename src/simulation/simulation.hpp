@@ -3,7 +3,7 @@
 
 #include "colony.h"
 #include "foodManager.h"
-#include "antManager.h"
+#include "antManager.hpp"
 
 class Simulation
 {

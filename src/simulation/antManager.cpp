@@ -1,5 +1,5 @@
 #include "../utils/viewPort.h"
-#include "antManager.h"
+#include "antManager.hpp"  // Updated include to .hpp extension
 
 #include <algorithm>
 #include <random>
@@ -51,13 +51,6 @@ void AntManager::spawnAnts(const Colony &colony)
     }
 }
 
-// Get list of ants
-const std::vector<Ant> &AntManager::getAnts() const
-{
-    return ants;
-}
-
-// Function to arrange hexagonal cells inside a circle
 std::vector<Point> AntManager::generateHexGrid(Point center, float radius, float cellSize)
 {
     std::vector<Point> positions;

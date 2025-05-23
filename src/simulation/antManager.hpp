@@ -1,0 +1,112 @@
+#pragma once
+
+#include <vector>
+#include "ant.h"
+#include "colony.h"
+#include "food.h"
+
+/**
+ * @class AntManager
+ * @brief Manages the simulation of ant behavior and interactions.
+ *
+ * This class is responsible for creating, updating, and rendering ants.
+ * It handles ant spawning, movement, collision detection, and interactions
+ * with food and the colony.
+ */
+class AntManager
+{
+public:
+    /**
+     * @brief Default constructor
+     */
+    AntManager();
+
+    /**
+     * @brief Spawns ants at the provided colony
+     * @param colony The colony where ants will spawn
+     */
+    void spawnAnts(const Colony& colony);
+
+    /**
+     * @brief Updates all ants' positions and states
+     * @param colony The colony that ants interact with
+     * @param food Vector of food sources that ants can interact with
+     */
+    void update(const Colony& colony, std::vector<Food>& food);
+
+    /**
+     * @brief Renders all ants to the window
+     * @param window The GLFW window to render to
+     */
+    void render(GLFWwindow* window) const;
+
+private:
+    /** Stores all ants in the simulation */
+    std::vector<Ant> ants;
+
+    /**
+     * @brief Generates a grid of hexagonal cells inside a circle
+     * @param center Center point of the circle
+     * @param radius Radius of the circle
+     * @param cellSize Size of each hexagonal cell
+     * @return Vector of points representing positions for the hexagonal grid
+     */
+    std::vector<Point> generateHexGrid(Point center, float radius, float cellSize);
+
+    /**
+     * @brief Checks if a position will collide with any other ant
+     * @param newPosition Position to check for collisions
+     * @param antSize Size of the ant
+     * @param currentIndex Index of the current ant (to avoid self-collision)
+     * @return True if collision detected, false otherwise
+     */
+    bool checkAntCollisions(const Point& newPosition, float antSize, size_t currentIndex);
+
+    /**
+     * @brief Checks if a position collides with food and returns the first food encountered
+     * @param newPosition Position to check for collisions
+     * @param antSize Size of the ant
+     * @param food Vector of food sources to check against
+     * @return Pointer to collided food or nullptr if no collision
+     */
+    Food* checkFoodCollisions(const Point& newPosition, float antSize, std::vector<Food>& food);
+
+    /**
+     * @brief Calculates velocity vector towards a target
+     * @param oldPosition Current position
+     * @param newPosition Target position
+     * @param strength Strength of the movement
+     * @return Velocity vector pointing towards the target
+     */
+    Point calcVelocityTowards(const Point& oldPosition, const Point& newPosition, float strength);
+
+    /**
+     * @brief Computes repulsion force to avoid collisions with nearby ants
+     * @param ant The ant for which to calculate repulsion
+     * @param currentIndex Index of the current ant
+     * @return Repulsion force vector
+     */
+    Point calcRepulsion(const Ant& ant, size_t currentIndex);
+
+    /**
+     * @brief Updates a single ant's position and state
+     * @param colony The colony that ants interact with
+     * @param food Vector of food sources
+     * @param currentIndex Index of the ant to update
+     */
+    void updateAnt(const Colony& colony, std::vector<Food>& food, size_t currentIndex);
+
+    /**
+     * @brief Checks if two circles collide
+     * @param lCenter Center of the first circle
+     * @param rCenter Center of the second circle
+     * @param lSize Radius of the first circle
+     * @param rSize Radius of the second circle
+     * @return True if circles collide, false otherwise
+     */
+    bool checkCollision(
+        const Point& lCenter,
+        const Point& rCenter,
+        const float& lSize,
+        const float& rSize) const;
+};
