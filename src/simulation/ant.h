@@ -13,7 +13,7 @@ public:
     Ant(Point position, float size);
     Ant(Point position, Point velocity, float size);
 
-    void render(GLFWwindow *window) override;
+    void render(GLFWwindow *window) const override;
 
     void biteFood(Food &food);
     void dropFood();

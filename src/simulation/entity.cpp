@@ -1,12 +1,13 @@
 #include "entity.h"
-#include "viewPort.h"
+#include "../utils/viewPort.h"
+
 #include <algorithm>
 #include <iostream>
 
 Entity::Entity(Point position, unsigned int hexColor, float size) : position(position), mainColor(hexColor), entitySize(size) {}
 
 // Draws a circle at the entity's position with a given size and color
-void Entity::drawCircleInPosition(unsigned int hexColor, float size, GLFWwindow *window)
+void Entity::drawCircleInPosition(unsigned int hexColor, float size, GLFWwindow *window) const
 {
     // Get viewport dimensions in pixels
     int width, height;

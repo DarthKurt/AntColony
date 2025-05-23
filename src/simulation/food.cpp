@@ -10,7 +10,7 @@ void Food::bite()
     }
 }
 
-void Food::render(GLFWwindow *window)
+void Food::render(GLFWwindow *window) const
 {
     drawCircleInPosition(mainColor, entitySize, window);
 }

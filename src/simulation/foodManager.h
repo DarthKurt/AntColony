@@ -10,7 +10,7 @@ public:
     FoodManager(Point colonyCenter, float colonyRadius);
 
     void update();
-    void render(GLFWwindow *window);
+    void render(GLFWwindow *window) const;
 
     std::vector<Food>& getFoodParticles();
 

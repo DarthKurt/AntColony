@@ -1,17 +1,10 @@
-#include "colony.h"
-#include "foodManager.h"
-#include "antManager.h"
-
+#include "simulation/simulation.hpp"
 #include <GLFW/glfw3.h>
+#include <chrono>
+#include <thread>
 #include <iostream>
 
-// Window dimensions
-const int WIDTH = 600;
-const int HEIGHT = 600;
-
-// Scale coordinates
-void framebuffer_size_callback(GLFWwindow *window, int width, int height)
-{
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     float aspectRatio = (float)width / (float)height;
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -19,77 +12,54 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
     glMatrixMode(GL_MODELVIEW);
 }
 
-// Update all entities
-void update(Colony &colony, FoodManager &foodManager, AntManager &antManager)
-{
-    std::vector<Food> &food = foodManager.getFoodParticles();
-    antManager.update(colony, food);
-    foodManager.update();
-}
-
-int main()
-{
-    // Initialize GLFW
-    if (!glfwInit())
-    {
+int main() {
+    if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW" << std::endl;
         return -1;
     }
 
-    // Create a windowed mode window
-    GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "Ant Colony Simulation", NULL, NULL);
-    if (!window)
-    {
+    GLFWwindow* window = glfwCreateWindow(600, 600, "Ant Colony Simulation", NULL, NULL);
+    if (!window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
     }
 
-    // Set OpenGL context
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    // Seed the random number generator
-    srand(time(nullptr));
+    srand(static_cast<unsigned>(time(nullptr)));
 
-    // Simulation constants
-    const float targetFrameTime = 1.0f / 30.0f; // Limit to 15 FPS
+    Simulation simulation;
 
-    // Create a colony at the center of the screen with 50 ants
-    Colony colony(Point(0.0f, 0.0f), 0.5f);
-    FoodManager food(Point(0.0f, 0.0f), 0.5f);
-    AntManager antManager;
+    const float targetFrameTimeMs = 1000.0f / 30.0f; // 30 FPS
 
-    antManager.spawnAnts(colony);
+    while (!glfwWindowShouldClose(window)) {
+        auto startTime = std::chrono::high_resolution_clock::now();
 
-    // Main loop
-    while (!glfwWindowShouldClose(window))
-    {
-        float startTime = glfwGetTime();
+        simulation.update();
 
-        // Clear the screen
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // Update food manager
-        update(colony, food, antManager);
-
-        // Render the colony (and ants inside it)
+        const Colony &colony = simulation.getColony();
         colony.render(window);
 
+        const AntManager &antManager = simulation.getAntManager();
         antManager.render(window);
 
-        // Render food
-        food.render(window);
+        const FoodManager&foodManager = simulation.getFoodManager();
+        foodManager.render(window);
 
-        // Swap buffers
         glfwSwapBuffers(window);
         glfwPollEvents();
 
-        // Control speed
-        while (glfwGetTime() - startTime < targetFrameTime);
+        auto endTime = std::chrono::high_resolution_clock::now();
+        auto frameDuration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
+        if (frameDuration.count() < targetFrameTimeMs) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(targetFrameTimeMs - frameDuration.count())));
+        }
     }
 
-    // Cleanup
     glfwDestroyWindow(window);
     glfwTerminate();
     return 0;

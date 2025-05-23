@@ -1,5 +1,5 @@
-#include "viewPort.h"
 #include "foodManager.h"
+#include "../utils/viewPort.h"
 
 #include <algorithm>
 
@@ -50,9 +50,9 @@ void FoodManager::update()
     removeDepletedFood();
 }
 
-void FoodManager::render(GLFWwindow *window)
+void FoodManager::render(GLFWwindow *window) const
 {
-    for (Food &food : foodParticles)
+    for (const Food &food : foodParticles)
         food.render(window);
 }
 

@@ -4,7 +4,7 @@ project(AntColonySim)
 set(CMAKE_CXX_STANDARD 11)
 
 # Добавляем исходники
-file(GLOB SIMULATION_SOURCES "src/*.[c,h]pp")
+file(GLOB SIMULATION_SOURCES "src/**/*.[c,h]pp")
 add_executable(AntColonySim "src/main.cpp" ${SIMULATION_SOURCES})
 
 # Находим GLFW через pkg-config

@@ -17,7 +17,7 @@ public:
 
     void update(const Colony &, std::vector<Food> &);
 
-    void render(GLFWwindow *window);
+    void render(GLFWwindow *window) const;
 
     // Get the list of ants
     const std::vector<Ant> &getAnts() const;

@@ -1,5 +1,5 @@
 #include "colony.h"
-#include "viewPort.h"
+#include "../utils/viewPort.h"
 
 Colony::Colony(Point position, float size)
     : Entity(position, 0x7d4827, size)
@@ -11,7 +11,7 @@ Colony::Colony(Point position, float size, unsigned int hexColor)
 {
 }
 
-void Colony::render(GLFWwindow *window)
+void Colony::render(GLFWwindow *window) const
 {
     drawCircleInPosition(mainColor, entitySize, window);
 }

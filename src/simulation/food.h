@@ -11,7 +11,7 @@ public:
     Food(Point position, float size, int capacity);
 
     void bite();
-    void render(GLFWwindow *window) override;
+    void render(GLFWwindow *window) const override;
 
     int getCapacity() const;
     Point getPosition() const override;

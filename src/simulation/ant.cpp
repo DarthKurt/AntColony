@@ -1,5 +1,5 @@
 #include "ant.h"
-#include "viewPort.h"
+#include "../utils/viewPort.h"
 
 // Constructor: Initializes ant position
 Ant::Ant(Point position, float size)
@@ -19,7 +19,7 @@ void Ant::dropFood()
     carryFood = false;
 }
 
-void Ant::render(GLFWwindow *window)
+void Ant::render(GLFWwindow *window) const
 {
     if (carryFood)
     {

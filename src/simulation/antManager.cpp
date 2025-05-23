@@ -1,4 +1,4 @@
-#include "viewPort.h"
+#include "../utils/viewPort.h"
 #include "antManager.h"
 
 #include <algorithm>
@@ -327,8 +327,8 @@ void AntManager::update(const Colony &colony, std::vector<Food> &food)
     }
 }
 
-void AntManager::render(GLFWwindow *window)
+void AntManager::render(GLFWwindow *window) const
 {
-    for (Ant &ant : ants)
+    for (const Ant &ant : ants)
         ant.render(window);
 }

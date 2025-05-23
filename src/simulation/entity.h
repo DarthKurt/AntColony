@@ -1,7 +1,7 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include "point.hpp"
+#include "../core/point.hpp"
 
 #include <GLFW/glfw3.h>
 
@@ -14,14 +14,14 @@ protected:
     unsigned int mainColor;
 
     // Draws a circle at the entity's position with a given size and color
-    void drawCircleInPosition(unsigned int hexColor, float size, GLFWwindow *window);
+    virtual void drawCircleInPosition(unsigned int hexColor, float size, GLFWwindow *window) const;
 
     virtual ~Entity() = default;
 
 public:
     Entity(Point pos, unsigned int hexColor, float size);
     // Abstract method for rendering
-    virtual void render(GLFWwindow *window) = 0;
+    virtual void render(GLFWwindow *window) const = 0;
 
     virtual Point getPosition() const = 0;
     virtual float getSize() const = 0;

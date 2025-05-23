@@ -12,7 +12,7 @@ public:
     Colony(Point position, float size);
     Colony(Point position, float size, unsigned int hexColor);
 
-    void render(GLFWwindow *window) override;
+    void render(GLFWwindow *window) const override;
 
     Point getPosition() const override;
     float getSize() const override;
