@@ -24,8 +24,9 @@ public:
     /**
      * @brief Spawns ants at the provided colony
      * @param colony The colony where ants will spawn
+     * @param antSize The desired size of ants
      */
-    void spawnAnts(const Colony& colony);
+    void spawnAnts(const Colony& colony, const float antSize);
 
     /**
      * @brief Updates all ants' positions and states

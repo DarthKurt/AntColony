@@ -74,7 +74,7 @@ int main()
     Simulation simulation;
 
     // Set framerate
-    const float targetFrameTimeMs = 1000.0f / 30.0f;
+    const auto targetFrameTimeMs = 1000.0f / 30.0f;
 
     while (!glfwWindowShouldClose(window))
     {
