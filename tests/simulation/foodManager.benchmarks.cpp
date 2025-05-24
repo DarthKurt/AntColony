@@ -1,24 +1,8 @@
-#include "../../src/simulation/foodManager.hpp"
-#include "../../src/core/point.hpp"
-#include "../../src/core/viewPort.hpp"
-
-#include "../fakeLogger.hpp"
-
-#include "foodManagerFixture.hpp"
-
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/benchmark/catch_benchmark.hpp>
-#include <vector>
-#include <cmath>
-#include <unordered_map>
 #include <iostream>
-#include <fstream>
-#include <memory>
 
-using namespace AntColony::Simulation;
-using namespace AntColony::Core;
-
-namespace SimulationTests = AntColony::Test::Simulation;
+#include "foodManagerFixture.hpp"
 
 namespace AntColony::Test::Simulation
 {
@@ -42,8 +26,7 @@ namespace AntColony::Test::Simulation
                           { 
                               for (int i = 0; i < 1000; ++i)
                                   foodManager->update();
-                              return foodManager->getFoodParticles().size(); 
-                          });
+                              return foodManager->getFoodParticles().size(); });
         };
 
         BENCHMARK_ADVANCED("FoodManager repeated update [10000]")(Catch::Benchmark::Chronometer meter)
@@ -54,8 +37,7 @@ namespace AntColony::Test::Simulation
                           { 
                               for (int i = 0; i < 10000; ++i)
                                   foodManager->update();
-                              return foodManager->getFoodParticles().size(); 
-                          });
+                              return foodManager->getFoodParticles().size(); });
         };
 
         BENCHMARK_ADVANCED("FoodManager repeated update [100000]")(Catch::Benchmark::Chronometer meter)
@@ -66,8 +48,7 @@ namespace AntColony::Test::Simulation
                           { 
                               for (int i = 0; i < 100000; ++i)
                                   foodManager->update();
-                              return foodManager->getFoodParticles().size(); 
-                          });
+                              return foodManager->getFoodParticles().size(); });
         };
 
         BENCHMARK_ADVANCED("FoodManager repeated update [1000000]")(Catch::Benchmark::Chronometer meter)
@@ -78,8 +59,7 @@ namespace AntColony::Test::Simulation
                           { 
                               for (int i = 0; i < 1000000; ++i)
                                   foodManager->update();
-                              return foodManager->getFoodParticles().size(); 
-                          });
+                              return foodManager->getFoodParticles().size(); });
         };
 
         BENCHMARK_ADVANCED("FoodManager repeated update and remove all [1000]")(Catch::Benchmark::Chronometer meter)

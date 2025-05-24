@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../../src/core/point.hpp"
 
 #include <vector>

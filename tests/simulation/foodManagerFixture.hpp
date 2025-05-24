@@ -1,17 +1,12 @@
+#pragma once
+
 #include "../../src/simulation/foodManager.hpp"
 #include "../../src/core/point.hpp"
 #include "../../src/core/viewPort.hpp"
-
 #include "../fakeLogger.hpp"
 
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/benchmark/catch_benchmark.hpp>
-#include <vector>
-#include <cmath>
-#include <unordered_map>
-#include <iostream>
-#include <fstream>
 #include <memory>
+#include <vector>
 
 using namespace AntColony::Simulation;
 using namespace AntColony::Core;

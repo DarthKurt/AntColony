@@ -1,25 +1,10 @@
-#include "../../src/simulation/foodManager.hpp"
-#include "../../src/core/point.hpp"
-#include "../../src/core/viewPort.hpp"
+#include <catch2/catch_test_macros.hpp>
+#include <iostream>
+#include <cmath>
 
-#include "../fakeLogger.hpp"
-
+#include "foodManagerFixture.hpp"
 #include "foodDistributionVisualizer.hpp"
 #include "foodDistributionAnalyzer.hpp"
-#include "foodManagerFixture.hpp"
-
-#include <catch2/catch_test_macros.hpp>
-#include <vector>
-#include <cmath>
-#include <unordered_map>
-#include <iostream>
-#include <fstream>
-#include <memory>
-
-using namespace AntColony::Simulation;
-using namespace AntColony::Core;
-
-namespace SimulationTests = AntColony::Test::Simulation;
 
 namespace AntColony::Test::Simulation
 {
@@ -28,7 +13,6 @@ namespace AntColony::Test::Simulation
         FoodManagerFixture fixture;
 
         // Generate a large number of food particles to ensure statistical significance
-        // And get the generated food particles
         const auto &foodParticles = fixture.runUpdateForFrames(1000000);
 
         // Setup analysis
@@ -46,9 +30,9 @@ namespace AntColony::Test::Simulation
         int numRings = 10;
 
         // Define parameters for radial analysis
-        SimulationTests::RadialDistributionAnalyzer analyzer(fixture.colonyCenter, fixture.colonyRadius, maxRadius, numRings);
+        RadialDistributionAnalyzer analyzer(fixture.colonyCenter, fixture.colonyRadius, maxRadius, numRings);
         // Create visualizer for the distribution
-        SimulationTests::FoodDistributionVisualizer visualizer(fixture.colonyCenter, fixture.colonyRadius, fixture.colonyRadius, maxRadius, numRings);
+        FoodDistributionVisualizer visualizer(fixture.colonyCenter, fixture.colonyRadius, fixture.colonyRadius, maxRadius, numRings);
 
         for (const auto &food : foodParticles)
         {
