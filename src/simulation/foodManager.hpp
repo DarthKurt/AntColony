@@ -13,6 +13,7 @@ namespace AntColony::Simulation
     class FoodManager : public BaseEntityManager
     {
     public:
+        FoodManager(std::shared_ptr<Core::Logger> logger, Core::Point colonyCenter, float colonyRadius, float foodRadius, Core::ViewPort viewPort);
         FoodManager(Core::Point colonyCenter, float colonyRadius, float foodRadius, Core::ViewPort viewPort);
 
         void update();

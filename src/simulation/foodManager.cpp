@@ -7,8 +7,11 @@
 
 namespace AntColony::Simulation
 {
+    FoodManager::FoodManager(std::shared_ptr<Core::Logger> logger, Core::Point colonyCenter, float colonyRadius, float foodRadius, Core::ViewPort viewPort)
+        : BaseEntityManager(logger), colonyCenter(colonyCenter), colonyRadius(colonyRadius), foodRadius(foodRadius), viewPort(viewPort) {}
+
     FoodManager::FoodManager(Core::Point colonyCenter, float colonyRadius, float foodRadius, Core::ViewPort viewPort)
-        : BaseEntityManager(std::make_shared<Utils::ConsoleLogger>()), colonyCenter(colonyCenter), colonyRadius(colonyRadius), foodRadius(foodRadius), viewPort(viewPort) {}
+        : FoodManager(std::make_shared<Utils::ConsoleLogger>(), colonyCenter, colonyRadius, foodRadius, viewPort) {}
 
     void FoodManager::spawnFood()
     {
@@ -47,24 +50,24 @@ namespace AntColony::Simulation
         if (dx > 0)
         {
             maxDist = (dy > 0)
-                        ? std::min(distToRight / dx, distToTop / dy)
-                        : std::min(distToRight / dx, distToBottom / -dy);
+                          ? std::min(distToRight / dx, distToTop / dy)
+                          : std::min(distToRight / dx, distToBottom / -dy);
         }
         else
         {
             maxDist = (dy > 0)
-                        ? std::min(distToLeft / -dx, distToTop / dy)
-                        : std::min(distToLeft / -dx, distToBottom / -dy);
+                          ? std::min(distToLeft / -dx, distToTop / dy)
+                          : std::min(distToLeft / -dx, distToBottom / -dy);
         }
 
         // For uniform spatial distribution, we need to sample based on area
         float minRSquared = (colonyRadius + initialFoodSize) * (colonyRadius + initialFoodSize);
         float maxRSquared = maxDist * maxDist;
-        
+
         // Sample from r² distribution for uniform area coverage
         float rSquared = random.getFloat(minRSquared, maxRSquared);
         float distance = std::sqrt(rSquared);
-        
+
         debug(startTime, "Selected distance: " + std::to_string(distance));
 
         // Calculate position

@@ -9,7 +9,7 @@ namespace AntColony::Test::Simulation
     class RadialDistributionAnalyzer
     {
     public:
-        RadialDistributionAnalyzer(float minRadius, float maxRadius, int numRings, Core::Point center)
+        RadialDistributionAnalyzer(Core::Point center, float minRadius, float maxRadius, int numRings)
             : minRadius(minRadius), maxRadius(maxRadius), numRings(numRings), center(center)
         {
             rings.resize(numRings, 0);
@@ -63,9 +63,9 @@ namespace AntColony::Test::Simulation
         }
 
     private:
+        Core::Point center;
         float minRadius, maxRadius;
         int numRings;
-        Core::Point center;
         std::vector<int> rings;
         std::vector<float> ringBoundaries;
         float ringArea;
