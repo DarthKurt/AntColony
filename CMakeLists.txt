@@ -6,8 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 find_program(CPP_CHECK NAMES cppcheck)
 if(CPP_CHECK)
     add_custom_target(run_cppcheck
-        COMMAND ${CPP_CHECK} --enable=all --suppress=missingIncludeSystem --inconclusive --std=c++17 --force "${CMAKE_SOURCE_DIR}/src"
-        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/src"
+        COMMAND ${CPP_CHECK} --enable=all --check-level=exhaustive --suppress=missingIncludeSystem --inconclusive --std=c++17 --force "${CMAKE_SOURCE_DIR}/src" "${CMAKE_SOURCE_DIR}/tests"
+        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     )
 endif()
 
@@ -18,13 +18,10 @@ file(GLOB_RECURSE SIMULATION_SOURCES "src/simulation/*.cpp")
 file(GLOB_RECURSE UTILS_SOURCES "src/utils/*.cpp")
 add_executable(AntColonySim "${CORE_SOURCES}" "${RENDER_SOURCES}" "${SIMULATION_SOURCES}" "${UTILS_SOURCES}" "src/main.cpp")
 
-# Находим GLFW через pkg-config
+# Find & Copy GLFW
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GLFW REQUIRED glfw3)
-
-# Создаем локальную директорию `libs` и копируем GLFW
 set(LIBS_DIR "${CMAKE_BINARY_DIR}/libs")
-
 file(MAKE_DIRECTORY ${LIBS_DIR})
 
 if(APPLE)
@@ -39,7 +36,7 @@ endif()
 
 add_dependencies(AntColonySim copy_glfw)
 
-# Используем относительный путь для подключения библиотеки
+# Include
 include_directories(${GLFW_INCLUDE_DIRS})
 link_directories(${LIBS_DIR})
 
@@ -52,10 +49,6 @@ if(APPLE)
     target_link_libraries(AntColonySim 
         "${LIBS_DIR}/libglfw.dylib"
         "${OPENGL_LIBRARIES}")
-        # "${OPENGL_LIBRARIES}"
-        # "-framework Cocoa"
-        # "-framework IOKit"
-        # "-framework CoreVideo")
 elseif(WIN32)
     target_link_libraries(AntColonySim ${GLFW_LIBRARIES} ${OPENGL_LIBRARIES} opengl32 gdi32)
 elseif(UNIX)

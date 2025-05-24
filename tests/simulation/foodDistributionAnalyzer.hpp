@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <cmath>
+#include <numeric>
 
 namespace AntColony::Test::Simulation
 {
@@ -12,7 +13,7 @@ namespace AntColony::Test::Simulation
     {
     public:
         RadialDistributionAnalyzer(Core::Point center, float minRadius, float maxRadius, int numRings)
-            : minRadius(minRadius), maxRadius(maxRadius), numRings(numRings), center(center)
+            :  center(center), minRadius(minRadius), maxRadius(maxRadius), numRings(numRings)
         {
             rings.resize(numRings, 0);
 
@@ -51,11 +52,8 @@ namespace AntColony::Test::Simulation
 
         double calculateCoefficientOfVariation()
         {
-            int totalPoints = 0;
-            for (int count : rings)
-            {
-                totalPoints += count;
-            }
+            // Sum all points in rings
+            int totalPoints = std::accumulate(rings.begin(), rings.end(), 0);
 
             double mean = static_cast<double>(totalPoints) / rings.size();
             double stdDev = calculateStandardDeviation(rings, mean);
@@ -73,7 +71,7 @@ namespace AntColony::Test::Simulation
         float ringArea;
 
         // Helper function to calculate standard deviation
-        double calculateStandardDeviation(const std::vector<int> &values, double mean)
+        static double calculateStandardDeviation(const std::vector<int> &values, double mean)
         {
             auto sumSquaredDiff = 0.0;
             for (auto value : values)
