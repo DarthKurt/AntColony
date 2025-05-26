@@ -246,7 +246,7 @@ namespace AntColony::Simulation
         return totalRepulsion * REPULSION_SCALING;
     }
 
-    void AntManager::updateAnt(const Colony &colony, std::vector<Food *> food, size_t currentIndex)
+    void AntManager::updateAnt(const Colony &colony, const std::vector<Food *> &food, size_t currentIndex)
     {
         const auto colonyPosition = colony.getPosition();
         const auto colonySize = colony.getSize();

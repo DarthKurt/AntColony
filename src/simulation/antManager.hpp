@@ -116,7 +116,7 @@ namespace AntColony::Simulation
          * @param food Vector of food sources
          * @param currentIndex Index of the ant to update
          */
-        void updateAnt(const Colony &colony, std::vector<Food *> food, size_t currentIndex);
+        void updateAnt(const Colony &colony, const std::vector<Food *> &food, size_t currentIndex);
 
         /**
          * @brief Checks if two circles collide
