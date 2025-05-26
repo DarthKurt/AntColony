@@ -1,11 +1,13 @@
 #include "baseEntityManager.hpp"
 
+#include <chrono>
+
 namespace AntColony::Simulation
 {
     BaseEntityManager::BaseEntityManager(std::shared_ptr<Core::Logger> logger)
         : logger(logger) {}
 
-    void BaseEntityManager::debug(const std::chrono::steady_clock::time_point *startTime, const std::string &message)
+    void BaseEntityManager::debug(const std::chrono::high_resolution_clock::time_point *startTime, const std::string &message)
     {
         if (startTime)
         {

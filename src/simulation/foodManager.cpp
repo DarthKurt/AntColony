@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <chrono>
 
 namespace AntColony::Simulation
 {
@@ -18,7 +19,7 @@ namespace AntColony::Simulation
 
 #ifndef NO_DEBUG
         // Time the update operations
-        const std::chrono::steady_clock::time_point tp = std::chrono::high_resolution_clock::now();
+        const auto tp = std::chrono::high_resolution_clock::now();
         const auto *startTime = &tp;
 #else
         const auto *startTime = nullptr;
