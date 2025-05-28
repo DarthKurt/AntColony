@@ -21,10 +21,12 @@ function(add_sanitizers_to_target_core target)
 endfunction()
 
 function(add_sanitizers_to_target target platform)
-    # Configure osxcross toolchain if targeting macOS
-    if(${platform} MATCHES "linux")
-        add_sanitizers_to_target_core(${target})
-    else()
-        message(FATAL_ERROR "Sanitizer for '${platform}' has not been implemented yet.")
+    if(ENABLE_ASAN OR ENABLE_LSAN)
+        # Configure osxcross toolchain if targeting macOS
+        if(${platform} MATCHES "linux")
+            add_sanitizers_to_target_core(${target})
+        else()
+            message(FATAL_ERROR "Sanitizer for '${platform}' has not been implemented yet.")
+        endif()
     endif()
 endfunction()
