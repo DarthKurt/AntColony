@@ -39,3 +39,21 @@ A simulation of ant behavior in search of food using pheromones. Ants move acros
 
 - **Languages**: C++.
 - **Rendering**: OpenGL.
+
+## Getting started
+
+Set wrokspace for target paltform
+
+```sh
+# MacOS (x64)
+cmake -B ./build-macos-x64 -D TARGET_PLATFORM=macOS-x64
+
+# MacOS (ARM)
+cmake -B ./build-macos-arm64 -D TARGET_PLATFORM=macOS-arm64
+
+# Linux (x64)
+cmake -B ./build-macos-x64 -D TARGET_PLATFORM=linux-x64
+
+# Linux (ARM)
+cmake -B ./build-linux-arm64 -D TARGET_PLATFORM=linux-arm64
+```
