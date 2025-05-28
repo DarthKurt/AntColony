@@ -44,8 +44,13 @@ message(STATUS "CMAKE_CXX_COMPILER: ${CMAKE_CXX_COMPILER}")
 # Include dependencies
 include(cmake/modules/dependencies.cmake)
 
+# Sanitizer config
+include(cmake/modules/sanitizers.cmake)
+
 # Include build modules
 include(cmake/modules/static-analysis.cmake)
 include(cmake/modules/library.cmake)
 include(cmake/modules/tests.cmake)
+
 include(cmake/modules/main.cmake)
+add_sanitizers_to_target(AntColonySim ${TARGET_PLATFORM})
