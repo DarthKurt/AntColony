@@ -127,6 +127,7 @@ target_link_libraries(
 
 catch_discover_tests(AntColonySimTests)
 message("Test configuration done")
+
 # Main
 message("Configure executable task")
 add_executable(AntColonySim "src/main.cpp")
