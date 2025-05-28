@@ -5,7 +5,6 @@
 
 #include <algorithm>
 #include <iostream>
-#include <GLFW/glfw3.h>
 
 namespace AntColony::Render::GLFW
 {

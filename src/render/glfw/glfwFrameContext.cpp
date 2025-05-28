@@ -4,7 +4,6 @@
 
 #include <thread>
 #include <chrono>
-#include <GLFW/glfw3.h>
 
 namespace AntColony::Render::GLFW
 {

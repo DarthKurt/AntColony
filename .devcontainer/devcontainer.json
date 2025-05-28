@@ -3,6 +3,13 @@
     "build": {
         "dockerfile": "Dockerfile"
     },
+    "mounts": [
+        // Some SDKs, like OSX that can't be distibuted 
+        "source=${localEnv:HOME}/SDKs/osxcross-osx-15.4/,target=/sdks/osxcross,type=bind,consistency=cached"
+    ],
+    "remoteEnv": {
+        "PATH": "sh ${containerEnv:PATH}:/usr/lib/llvm-19/bin"
+    },
     "customizations": {
         "vscode": {
             "extensions": [

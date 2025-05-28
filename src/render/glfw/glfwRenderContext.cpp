@@ -3,8 +3,8 @@
 #include "glfwRenderer.hpp"
 #include "constants.hpp"
 
-#include <GLFW/glfw3.h>
 #include <iostream>
+#include <GLFW/glfw3.h>
 
 namespace AntColony::Render::GLFW
 {

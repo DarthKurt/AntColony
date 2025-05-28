@@ -2,8 +2,18 @@
     "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
     "name": "ant-colony",
     "version": "0.1.0",
+    "builtin-baseline": "110c50d4700794d87d95138cd8c1b3bbfee9bab5",
     "dependencies": [
-        "glfw3",
+        {
+            "name": "glfw3",
+            "version>=": "3.4#1"
+        },
         "catch2"
+    ],
+    "overrides": [
+        {
+            "name": "glfw3",
+            "version": "3.4#1"
+        }
     ]
 }

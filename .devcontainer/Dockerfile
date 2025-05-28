@@ -216,12 +216,12 @@ RUN sh -c "$(curl -fsSL https://starship.rs/install.sh)" -- --yes && \
 
 ENV VCPKG_ROOT=/opt/vcpkg
 ENV VCPKG_INSTALLATION_ROOT=/opt/vcpkg
-ENV VCPKG_TRIPLET=x64-linux
+ENV VCPKG_TRIPLET=arm64-linux
 ENV VCPKG_FORCE_SYSTEM_BINARIES=1
 ENV VCPKG_USE_SYSTEM_BINARIES=1
 ENV PATH="${PATH}:${VCPKG_ROOT}"
 
-RUN git clone --depth=1 \
+RUN git clone \
     -c core.eol=lf \
     -c core.autocrlf=false \
     -c fsck.zeroPaddedFilemode=ignore \

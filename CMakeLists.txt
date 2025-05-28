@@ -29,38 +29,27 @@ if(NOT TARGET_PLATFORM)
 endif()
 message(STATUS "Target platform: ${TARGET_PLATFORM}")
 
-# Map platforms to vcpkg triplets
-set(PLATFORM_TO_TRIPLET_windows-x64 "x64-windows")
-set(PLATFORM_TO_TRIPLET_windows-arm64 "arm64-windows")
-set(PLATFORM_TO_TRIPLET_linux-x64 "x64-linux")
-set(PLATFORM_TO_TRIPLET_linux-arm64 "arm64-linux")
-set(PLATFORM_TO_TRIPLET_macOS-x64 "x64-osx")
-set(PLATFORM_TO_TRIPLET_macOS-arm64 "arm64-osx")
-
-# Auto-configure vcpkg triplet based on platform
-if(TARGET_PLATFORM)
-    set(TRIPLET_VAR_NAME "PLATFORM_TO_TRIPLET_${TARGET_PLATFORM}")
-    if(DEFINED ${TRIPLET_VAR_NAME})
-        set(VCPKG_TARGET_TRIPLET "${${TRIPLET_VAR_NAME}}" CACHE STRING "Vcpkg target triplet")
-        message(STATUS "Auto-configured VCPKG_TARGET_TRIPLET to ${VCPKG_TARGET_TRIPLET} based on TARGET_PLATFORM")
-    else()
-        message(FATAL_ERROR "Unknown TARGET_PLATFORM '${TARGET_PLATFORM}'. VCPKG_TARGET_TRIPLET not auto-configured.")
-    endif()
+# Configure osxcross toolchain if targeting macOS
+if(TARGET_PLATFORM MATCHES "macOS")
+    include(cmake/modules/osxcross-setup.cmake)
+elseif(TARGET_PLATFORM MATCHES "linux")
+    include(cmake/modules/linux-setup.cmake)
+else()
+    message(FATAL_ERROR "Unknown TARGET_PLATFORM '${TARGET_PLATFORM}'.")
 endif()
-
-# Set vcpkg toolchain file (for automatic package handling)
-set(CMAKE_TOOLCHAIN_FILE "/opt/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
 
 project(AntColonySim LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-message(STATUS "Using toolchain file: ${CMAKE_TOOLCHAIN_FILE}")
+message(STATUS "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
+
+message(STATUS "CMAKE_CXX_COMPILER: ${CMAKE_CXX_COMPILER}")
 
 ## OpenGL
-find_package(OpenGL REQUIRED)
-message(STATUS "OpenGL lib found: ${OPENGL_LIBRARIES}")
+find_package(OpenGL CONFIG REQUIRED)
+message(STATUS "OpenGL lib found")
 
 # GLFW
 find_package(glfw3 CONFIG REQUIRED)
@@ -96,14 +85,22 @@ pretty_print_files("Render sources" RENDER_SOURCES)
 pretty_print_files("Simulation sources" SIMULATION_SOURCES)
 pretty_print_files("Utils sources" UTILS_SOURCES)
 
-target_sources(AntColonySimLib PUBLIC 
+target_sources(
+    AntColonySimLib
+    PUBLIC 
     ${CORE_SOURCES} 
     ${RENDER_SOURCES}
     ${SIMULATION_SOURCES}
-    ${UTILS_SOURCES})
+    ${UTILS_SOURCES}
+)
 
 # Lib sources
-target_link_libraries(AntColonySimLib PRIVATE "glfw" "OpenGL::GL")
+target_link_libraries(
+    AntColonySimLib
+    PRIVATE
+    glfw
+    OpenGL::GL
+)
 message("Lib configuration done")
 
 # Tests
@@ -113,15 +110,30 @@ include(Catch)
 
 file(GLOB_RECURSE SIMULATION_TEST_SOURCES "tests/*.cpp")
 pretty_print_files("Test sources" SIMULATION_TEST_SOURCES)
+
 if(NOT SIMULATION_TEST_SOURCES)
     message(WARNING "No test source files found in tests/simulation/")
 endif()
+
 add_executable(AntColonySimTests "${SIMULATION_TEST_SOURCES}")
-target_link_libraries(AntColonySimTests PRIVATE AntColonySimLib "glfw" "OpenGL::GL" "Catch2::Catch2WithMain")
+target_link_libraries(
+    AntColonySimTests
+    PRIVATE
+    AntColonySimLib
+    glfw
+    OpenGL::GL
+    Catch2::Catch2WithMain
+)
 
 catch_discover_tests(AntColonySimTests)
 message("Test configuration done")
 # Main
 message("Configure executable task")
 add_executable(AntColonySim "src/main.cpp")
-target_link_libraries(AntColonySim PRIVATE AntColonySimLib glfw)
+target_link_libraries(
+    AntColonySim
+    PRIVATE
+    AntColonySimLib
+    glfw
+    OpenGL::GL
+)
