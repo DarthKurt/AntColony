@@ -8,7 +8,7 @@ namespace AntColony::Simulation
     Ant::Ant(Core::Point position, Core::Point velocity, float size)
         : BaseEntity(position, 0xfc6203, size), velocity(velocity), carryFood(false) {}
 
-    void Ant::biteFood(Food *food)
+    void Ant::biteFood(std::shared_ptr<Food> food)
     {
         if (!carryFood)
         {

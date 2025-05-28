@@ -40,7 +40,7 @@ namespace AntColony::Test::Simulation
                 viewport);
         }
 
-        const std::vector<Food *> runUpdateForFrames(const int frames)
+        const std::vector<std::shared_ptr<Food>> runUpdateForFrames(const int frames)
         {
             for (int i = 0; i < frames; ++i)
             {

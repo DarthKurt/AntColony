@@ -4,6 +4,8 @@
 #include "food.hpp"
 #include "../core/point.hpp"
 
+#include <memory>
+
 namespace AntColony::Simulation
 {
     class Ant : public Entity, public BaseEntity
@@ -14,7 +16,7 @@ namespace AntColony::Simulation
 
         void render(const Render::Renderer &renderer) const override;
 
-        void biteFood(Food *food);
+        void biteFood(std::shared_ptr<Food> food);
         void dropFood();
 
         void setPosition(Core::Point newPosition);

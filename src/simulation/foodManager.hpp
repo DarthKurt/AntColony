@@ -19,7 +19,7 @@ namespace AntColony::Simulation
         void update();
         void render(const Render::Renderer &renderer) const;
 
-        std::vector<Food *> getFoodParticles() const;
+        std::vector<std::shared_ptr<Food>> getFoodParticles() const;
 
     private:
         Core::Point colonyCenter;
@@ -29,6 +29,6 @@ namespace AntColony::Simulation
 
         void spawnFood();
 
-        std::unordered_map<Food *, std::unique_ptr<Food>> foodParticles;
+        std::unordered_map<Food *, std::shared_ptr<Food>> foodParticles;
     };
 }

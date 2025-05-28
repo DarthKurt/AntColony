@@ -5,8 +5,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <vector>
-#include <memory>
 
 namespace AntColony::Simulation
 {
@@ -145,7 +143,7 @@ namespace AntColony::Simulation
         return hasCollision;
     }
 
-    Food *AntManager::checkFoodCollisions(const Core::Point &newPosition, float antSize, const std::vector<Food *> &food)
+    std::shared_ptr<Food> AntManager::checkFoodCollisions(const Core::Point &newPosition, float antSize, const std::vector<std::shared_ptr<Food>> &food)
     {
         for (auto piece : food)
         {
@@ -154,7 +152,6 @@ namespace AntColony::Simulation
 
             if (checkCollision(newPosition, piece->getPosition(), antSize, piece->getSize()))
             {
-                // Return Core::Pointer to collided food
                 return piece;
             }
         }
@@ -246,7 +243,7 @@ namespace AntColony::Simulation
         return totalRepulsion * REPULSION_SCALING;
     }
 
-    void AntManager::updateAnt(const Colony &colony, const std::vector<Food *> &food, size_t currentIndex)
+    void AntManager::updateAnt(const Colony &colony, const std::vector<std::shared_ptr<Food>> &food, size_t currentIndex)
     {
         const auto colonyPosition = colony.getPosition();
         const auto colonySize = colony.getSize();
@@ -274,7 +271,7 @@ namespace AntColony::Simulation
                 // Check for food collision
                 if (!ant.isBusy())
                 {
-                    auto *collidedFood = checkFoodCollisions(newPosition, antSize, food);
+                    auto collidedFood = checkFoodCollisions(newPosition, antSize, food);
 
                     if (collidedFood)
                     {
@@ -308,7 +305,7 @@ namespace AntColony::Simulation
             if (validPosition)
             {
                 // Check for food interactions
-                auto *collidedFood = checkFoodCollisions(newPosition, antSize, food);
+                auto collidedFood = checkFoodCollisions(newPosition, antSize, food);
                 if (collidedFood && !ant.isBusy())
                 {
                     // Collect food
@@ -333,7 +330,7 @@ namespace AntColony::Simulation
         }
     }
 
-    void AntManager::update(const Colony &colony, const std::vector<Food *> &food)
+    void AntManager::update(const Colony &colony, const std::vector<std::shared_ptr<Food>> &food)
     {
         for (auto i = 0; i < ants.size(); i++)
         {

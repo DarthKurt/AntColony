@@ -103,14 +103,14 @@ namespace AntColony::Simulation
         }
     }
 
-    std::vector<Food *> FoodManager::getFoodParticles() const
+    std::vector<std::shared_ptr<Food>> FoodManager::getFoodParticles() const
     {
-        std::vector<Food *> result;
+        std::vector<std::shared_ptr<Food>> result;
         result.reserve(foodParticles.size());
 
         for (const auto &[ptr, food] : foodParticles)
         {
-            result.emplace_back(ptr);
+            result.emplace_back(food);
         }
 
         return result;
