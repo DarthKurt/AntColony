@@ -52,8 +52,14 @@ cmake -B ./build-macos-x64 -D TARGET_PLATFORM=macOS-x64
 cmake -B ./build-macos-arm64 -D TARGET_PLATFORM=macOS-arm64
 
 # Linux (x64)
-cmake -B ./build-macos-x64 -D TARGET_PLATFORM=linux-x64
+cmake -B ./build-linux-x64 -D TARGET_PLATFORM=linux-x64
 
 # Linux (ARM)
 cmake -B ./build-linux-arm64 -D TARGET_PLATFORM=linux-arm64
+
+# Windows (ARM)
+cmake -B ./build-win-arm64 -D TARGET_PLATFORM=windows-arm64
+
+# Windows (x64)
+cmake -B ./build-win-arm64 -D TARGET_PLATFORM=windows-x64
 ```

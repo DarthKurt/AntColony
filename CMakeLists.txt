@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.0.2)
+cmake_minimum_required(VERSION 4.0.2 FATAL_ERROR)
 
 # Include core functions
 include(cmake/modules/core.cmake)
@@ -12,9 +12,9 @@ if(NOT TARGET_PLATFORM)
     )
     
     if(ARCH STREQUAL "x86_64")
-        set(TARGET_PLATFORM "linux-x64" CACHE STRING "Target platform" FORCE)
+        set(TARGET_PLATFORM "linux-x64")
     elseif(ARCH STREQUAL "aarch64" OR ARCH STREQUAL "arm64")
-        set(TARGET_PLATFORM "linux-arm64" CACHE STRING "Target platform" FORCE)
+        set(TARGET_PLATFORM "linux-arm64")
     endif()
 endif()
 
@@ -29,6 +29,8 @@ if(TARGET_PLATFORM MATCHES "macOS")
     include(cmake/modules/osxcross-setup.cmake)
 elseif(TARGET_PLATFORM MATCHES "linux")
     include(cmake/modules/linux-setup.cmake)
+elseif(TARGET_PLATFORM MATCHES "windows")
+    include(cmake/modules/windows-setup.cmake)
 else()
     message(FATAL_ERROR "Unknown TARGET_PLATFORM '${TARGET_PLATFORM}'.")
 endif()
