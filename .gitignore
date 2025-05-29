@@ -38,6 +38,7 @@
 # Build folders
 build
 build-*
+!documentation/**/*.md
 
 # MacOS
 .DS_Store

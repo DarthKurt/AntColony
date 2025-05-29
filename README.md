@@ -42,24 +42,48 @@ A simulation of ant behavior in search of food using pheromones. Ants move acros
 
 ## Getting started
 
-Set wrokspace for target paltform
+0. For MacOS builds you need to have [SDK mounted](./documentation/build-for-macos.md#mount-sdk-to-workspace).
+1. Open workspace in provided Devcontainer.
+2. Set wrokspace for target paltform
 
 ```sh
 # MacOS (x64)
-cmake -B ./build-macos-x64 -D TARGET_PLATFORM=macOS-x64
+cmake -B build-macos-x64 -D TARGET_PLATFORM=macOS-x64
 
 # MacOS (ARM)
-cmake -B ./build-macos-arm64 -D TARGET_PLATFORM=macOS-arm64
+cmake -B build-macos-arm64 -D TARGET_PLATFORM=macOS-arm64
 
 # Linux (x64)
-cmake -B ./build-linux-x64 -D TARGET_PLATFORM=linux-x64
+cmake -B build-linux-x64 -D TARGET_PLATFORM=linux-x64
 
 # Linux (ARM)
-cmake -B ./build-linux-arm64 -D TARGET_PLATFORM=linux-arm64
-
-# Windows (ARM)
-cmake -B ./build-win-arm64 -D TARGET_PLATFORM=windows-arm64
+cmake -B build-linux-arm64 -D TARGET_PLATFORM=linux-arm64
 
 # Windows (x64)
-cmake -B ./build-win-arm64 -D TARGET_PLATFORM=windows-x64
+cmake -B build-win-x64 -D TARGET_PLATFORM=windows-x64
+
+# Windows (ARM)
+cmake -B build-win-arm64 -D TARGET_PLATFORM=windows-arm64
+```
+
+3. Build target paltform (only executable, AntColonySim)
+
+```sh
+# MacOS (x64)
+cmake --build build-macos-x64 --target AntColonySim
+
+# MacOS (ARM)
+cmake --build build-macos-arm64 --target AntColonySim
+
+# Linux (x64)
+cmake --build build-linux-x64 --target AntColonySim
+
+# Linux (ARM)
+cmake --build build-linux-arm64 --target AntColonySim
+
+# Windows (x64)
+cmake --build build-win-x64 --target AntColonySim
+
+# Windows (ARM)
+cmake --build build-win-arm64 --target AntColonySim
 ```
