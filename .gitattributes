@@ -1,4 +1,3 @@
-
 ###############################
 # Git Line Endings            #
 ###############################
@@ -14,3 +13,12 @@
 # Force bash scripts to always use LF line endings so that if a repo is accessed
 # in Unix via a file share from Windows, the scripts will work.
 *.sh text eol=lf
+
+###############################
+# Git binaries                #
+###############################
+*.gif binary
+*.jpeg binary
+*.png binary
+*.gz binary
+*.jar binary

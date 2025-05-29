@@ -1,8 +1,6 @@
 {
     "name": "AntColonySim Devcontainer",
-    "build": {
-        "dockerfile": "Dockerfile"
-    },
+    "image": "ghcr.io/darthkurt/devcontainer-cpp:latest",
     "mounts": [
         // Some SDKs, like OSX that can't be distibuted 
         "source=${localEnv:HOME}/SDKs/osxcross-osx-15.4/,target=/sdks/osxcross,type=bind,consistency=cached"
