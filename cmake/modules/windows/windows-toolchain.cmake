@@ -14,8 +14,8 @@ set(CMAKE_TRY_COMPILE_PLATFORM_VARIABLES
     LLVM_TOOLCHAIN_FILE
 )
 
-# Disable PowerShell usage in vcpkg
-set(VCPKG_POWERSHELL_PATH "")
+# PowerShell usage in vcpkg
+set(VCPKG_POWERSHELL_PATH "pwsh")
 
 if(LLVM_TOOLCHAIN_FILE)
     include("${LLVM_TOOLCHAIN_FILE}")

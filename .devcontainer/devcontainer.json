@@ -41,7 +41,8 @@
     },
     "remoteUser": "root",
     "features": {
-        "ghcr.io/devcontainers/features/desktop-lite:1": {}
+        "ghcr.io/devcontainers/features/desktop-lite:1": {},
+        "ghcr.io/devcontainers/features/powershell:1": {}
     },
     "forwardPorts": [
         6080,
