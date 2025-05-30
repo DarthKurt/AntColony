@@ -22,11 +22,9 @@ namespace AntColony::Render
          */
         virtual void drawText(const Core::Point &position, const std::string &text, const Core::Color &color) const = 0;
 
-
         /**
          * @brief Draws a frame around position with length and height
          */
         virtual void drawFrame(const Core::Point &position, const float length, const float height, const Core::Color &color) const = 0;
-        
     };
 }

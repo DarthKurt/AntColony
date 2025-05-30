@@ -8,4 +8,5 @@ target_link_libraries(
     glad
     OpenGL::GL
     stb
+    dejavu
 )

@@ -11,6 +11,8 @@ if(NOT TARGET STB::TRUETYPE)
         message(FATAL_ERROR "Failed to install stb_truetype, file not found: ${STB_TRUETYPE_PATH}")
     else()
         add_library(stb INTERFACE)
-        target_include_directories(stb INTERFACE "${stb_SOURCE_DIR}")
+        target_include_directories(stb INTERFACE 
+            "${stb_SOURCE_DIR}"
+        )
     endif()
 endif()

@@ -6,7 +6,6 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include <stb_truetype.h>
 
 namespace AntColony::Render::GLFW
 {
@@ -84,23 +83,4 @@ namespace AntColony::Render::GLFW
         glfwDestroyWindow(window);
         glfwTerminate();
     }
-
-    // bool initFont(const char *fontPath)
-    // {
-    //     std::ifstream file(fontPath, std::ios::binary | std::ios::ate);
-    //     if (!file)
-    //         return false;
-
-    //     std::streamsize size = file.tellg();
-    //     file.seekg(0, std::ios::beg);
-    //     std::vector<unsigned char> buffer(size);
-    //     if (!file.read(reinterpret_cast<char *>(buffer.data()), size))
-    //         return false;
-
-    //     stbtt_fontinfo fontInfo;
-    //     if (!stbtt_InitFont(&fontInfo, buffer.data(), 0))
-    //         return false;
-
-    //     return true;
-    // }
 }
