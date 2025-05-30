@@ -20,7 +20,7 @@ namespace AntColony::Simulation
 
         explicit PheromoneManager(std::shared_ptr<Core::Logger> logger, float pheromoneSize);
 
-        void update(std::stack<PheromoneSignal> newPositions);
+        void update(const std::stack<PheromoneSignal> &signals);
         void render(const Render::Renderer &renderer) const;
 
         const std::vector<PheromoneSignal> getPheromones() const;
@@ -28,7 +28,7 @@ namespace AntColony::Simulation
     private:
         std::unordered_map<Pheromone *, std::shared_ptr<Pheromone>> pheromones;
         float pheromoneSize;
-        void depositPheromone(PheromoneSignal position);
+        void depositPheromone(PheromoneSignal signal);
         void depositPheromones(std::stack<PheromoneSignal> positions);
     };
 }

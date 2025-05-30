@@ -37,7 +37,7 @@ namespace AntColony::Simulation
     {
         const auto &food = foodManager.getFoodParticles();
         const auto &pheromones = pheromoneManager.getPheromones();
-        auto poisitions = antManager.update(colony, food, pheromones);
+        const auto poisitions = antManager.update(colony, food, pheromones);
         pheromoneManager.update(poisitions);
         foodManager.update();
     }

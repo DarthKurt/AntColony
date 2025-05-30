@@ -3,9 +3,19 @@
 namespace AntColony::Simulation
 {
     Ant::Ant(Core::Point position, float size, int pheromoneThreshold)
-        : BaseEntity(position, 0xfc6203, size), velocity(Core::Point(0.0f, 0.0f)), carryFood(false), pheromoneChargeThreshold(pheromoneThreshold) {}
+        : BaseEntity(position, 0xfc6203, size),
+          velocity(Core::Point(0.0f, 0.0f)),
+          carryFood(false),
+          pheromoneExcitement(0),
+          pheromoneCharge(0),
+          pheromoneChargeThreshold(pheromoneThreshold) {}
     Ant::Ant(Core::Point position, Core::Point velocity, float size, int pheromoneThreshold)
-        : BaseEntity(position, 0xfc6203, size), velocity(velocity), carryFood(false), pheromoneChargeThreshold(pheromoneThreshold) {}
+        : BaseEntity(position, 0xfc6203, size),
+          velocity(velocity),
+          carryFood(false),
+          pheromoneExcitement(0),
+          pheromoneCharge(0),
+          pheromoneChargeThreshold(pheromoneThreshold) {}
 
     void Ant::biteFood(std::shared_ptr<Food> food)
     {

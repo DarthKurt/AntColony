@@ -8,7 +8,7 @@ namespace AntColony::Simulation
     PheromoneManager::PheromoneManager(std::shared_ptr<Core::Logger> logger, float pheromoneSize)
         : BaseEntityManager(logger), pheromoneSize(pheromoneSize) {}
 
-    void PheromoneManager::update(std::stack<PheromoneSignal> signals)
+    void PheromoneManager::update(const std::stack<PheromoneSignal> &signals)
     {
         std::stack<Pheromone *> toDelete;
         for (const auto &[ptr, pheromone] : pheromones)
