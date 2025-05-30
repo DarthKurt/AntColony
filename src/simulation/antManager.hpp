@@ -4,12 +4,14 @@
 #include "colony.hpp"
 #include "food.hpp"
 #include "baseEntityManager.hpp"
+#include "pheromoneSignal.hpp"
 
 #include "../core/logger.hpp"
 #include "../core/viewPort.hpp"
 
 #include <vector>
 #include <memory>
+#include <stack>
 
 namespace AntColony::Simulation
 {
@@ -45,8 +47,12 @@ namespace AntColony::Simulation
          * @brief Updates all ants' positions and states
          * @param colony The colony that ants interact with
          * @param food Vector of food sources that ants can interact with
+         * @return Stack of signals representing positions where pheromone should spawn and its relative strength (ants excitement)
          */
-        void update(const Colony &colony, const std::vector<std::shared_ptr<Food>> &food);
+        std::stack<PheromoneSignal> update(
+            const Colony &colony,
+            const std::vector<std::shared_ptr<Food>> &food,
+            const std::vector<PheromoneSignal> &incomingSignals);
 
         /**
          * @brief Renders all ants to the window
@@ -103,33 +109,47 @@ namespace AntColony::Simulation
         static Core::Point calcVelocityTowards(const Core::Point &oldPosition, const Core::Point &newPosition, float strength);
 
         /**
-         * @brief Computes repulsion force to avoid collisions with nearby ants
-         * @param ant The ant for which to calculate repulsion
+         * @brief              Computes repulsion force to avoid collisions with nearby ants
+         * @param ant          The ant for which to calculate repulsion
          * @param currentIndex Index of the current ant
-         * @return Repulsion force vector
+         * @return             Repulsion force vector
          */
         Core::Point calcRepulsion(const Ant &ant, size_t currentIndex) const;
 
         /**
-         * @brief Updates a single ant's position and state
-         * @param colony The colony that ants interact with
-         * @param food Vector of food sources
-         * @param currentIndex Index of the ant to update
+         * @brief                   Updates a single ant's position and state
+         * @param colony            The colony that ants interact with
+         * @param food              Vector of food sources
+         * @param incomingSignals   Vector of pheromones
+         * @param currentIndex      Index of the ant to update
+         * @return                  True if pheromone should be spawn
          */
-        void updateAnt(const Colony &colony, const std::vector<std::shared_ptr<Food>> &food, size_t currentIndex);
+        bool updateAnt(const Colony &colony,
+                       const std::vector<std::shared_ptr<Food>> &food,
+                       const std::vector<PheromoneSignal> &incomingSignals,
+                       const float maxPheromoneDetectionDistance,
+                       const float maxPheromoneRealtiveStrength,
+                       size_t currentIndex);
 
         /**
-         * @brief Checks if two circles collide
+         * @brief         Checks if two circles collide
          * @param lCenter Center of the first circle
          * @param rCenter Center of the second circle
-         * @param lSize Radius of the first circle
-         * @param rSize Radius of the second circle
-         * @return True if circles collide, false otherwise
+         * @param lSize   Radius of the first circle
+         * @param rSize   Radius of the second circle
+         * @return        True if circles collide, false otherwise
          */
         static bool checkCollision(
             const Core::Point &lCenter,
             const Core::Point &rCenter,
             const float &lSize,
             const float &rSize);
+
+        static float calcPheromoneAttraction(
+            const Core::Point &antPosition,
+            const Core::Point &antVelocity,
+            const PheromoneSignal &pheromone,
+            const float maxDetectionDistance,
+            const int maxRealtiveStrength);
     };
 }

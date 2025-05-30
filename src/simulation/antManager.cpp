@@ -17,6 +17,7 @@ namespace AntColony::Simulation
     constexpr auto REPULSION_SCALING = 0.25f;
     constexpr auto VELOCITY_SCALING_THRESHOLD = 0.1f;
     constexpr auto MAX_POSITION_ATTEMPTS = 10;
+    constexpr auto PHEROMONE_CHARGE_THRESHOLD = 30;
 
     AntManager::AntManager(Core::ViewPort viewPort)
         : AntManager(std::make_shared<Utils::ConsoleLogger>(), viewPort) {}
@@ -72,7 +73,7 @@ namespace AntColony::Simulation
         ants.reserve(numAnts);
         for (auto i = 0; i < numAnts; i++)
         {
-            ants.emplace_back(shuffledPositions[i], antSize);
+            ants.emplace_back(shuffledPositions[i], antSize, PHEROMONE_CHARGE_THRESHOLD);
         }
     }
 
@@ -243,7 +244,13 @@ namespace AntColony::Simulation
         return totalRepulsion * REPULSION_SCALING;
     }
 
-    void AntManager::updateAnt(const Colony &colony, const std::vector<std::shared_ptr<Food>> &food, size_t currentIndex)
+    bool AntManager::updateAnt(
+        const Colony &colony,
+        const std::vector<std::shared_ptr<Food>> &food,
+        const std::vector<PheromoneSignal> &incomingSignals,
+        const float maxPheromoneDetectionDistance,
+        const float maxPheromoneRealtiveStrength,
+        size_t currentIndex)
     {
         const auto colonyPosition = colony.getPosition();
         const auto colonySize = colony.getSize();
@@ -258,6 +265,38 @@ namespace AntColony::Simulation
         {
             const auto newVelocity = calcVelocityTowards(currentPosition, colonyPosition, COLONY_TARGET_ATTRACTION);
             ant.setVelocity(newVelocity);
+        }
+        else
+        {
+            // Find the most attractive pheromone
+            auto bestAttraction = 0.0f;
+            Core::Point bestTarget;
+
+            for (const auto &signal : incomingSignals)
+            {
+                auto attraction = calcPheromoneAttraction(
+                    currentPosition,
+                    currentVelocity,
+                    signal,
+                    maxPheromoneDetectionDistance,
+                    maxPheromoneRealtiveStrength);
+                if (attraction > bestAttraction)
+                {
+                    bestAttraction = attraction;
+                    bestTarget = signal.position;
+                }
+            }
+
+            // If found attractive pheromone, adjust movement
+            if (bestAttraction > 0.1f)
+            {
+                const auto attractionVelocity = calcVelocityTowards(
+                    currentPosition,
+                    bestTarget,
+                    COLONY_TARGET_ATTRACTION * bestAttraction);
+
+                ant.setVelocity(attractionVelocity);
+            }
         }
 
         if (ant.isMoving())
@@ -288,7 +327,7 @@ namespace AntColony::Simulation
 
                 // Update position and return early
                 ant.setPosition(newPosition);
-                return;
+                return ant.trySpawnPheromone();
             }
         }
 
@@ -325,23 +364,100 @@ namespace AntColony::Simulation
 
                 // Update position and break out of retry loop
                 ant.setPosition(newPosition);
-                break;
+                return ant.trySpawnPheromone();
             }
         }
+
+        return false;
     }
 
-    void AntManager::update(const Colony &colony, const std::vector<std::shared_ptr<Food>> &food)
+    std::stack<PheromoneSignal> AntManager::update(
+        const Colony &colony,
+        const std::vector<std::shared_ptr<Food>> &food,
+        const std::vector<PheromoneSignal> &incomingSignals)
     {
+        std::stack<PheromoneSignal> outcomingSignals;
+
+        // Assume it is half of the minimal viewport distance
+        const auto maxPheromonAffectDistance = std::min(viewPort.maxX - viewPort.minX, viewPort.maxY - viewPort.minY);
+
+        // Get the maximum strength
+        const auto strongestPheromone = std::max_element(
+            incomingSignals.begin(),
+            incomingSignals.end(),
+            [](const PheromoneSignal &a, const PheromoneSignal &b)
+            {
+                return a.excitement < b.excitement;
+            });
+
+        const auto maxPheromoneRealtiveStrength = strongestPheromone == incomingSignals.end()
+                                                 ? 0
+                                                 : strongestPheromone->excitement;
+
         for (auto i = 0; i < ants.size(); i++)
         {
-            // Pass index instead of filtering in advance
-            updateAnt(colony, food, i);
+            if (updateAnt(colony, food, incomingSignals, maxPheromonAffectDistance, maxPheromoneRealtiveStrength, i))
+            {
+                const auto signal = ants[i].consumePheromoneCharge();
+                outcomingSignals.push(signal);
+            }
         }
+
+        return outcomingSignals;
     }
 
     void AntManager::render(const Render::Renderer &renderer) const
     {
         for (const auto &ant : ants)
             ant.render(renderer);
+    }
+
+    float AntManager::calcPheromoneAttraction(
+        const Core::Point &antPosition,
+        const Core::Point &antVelocity,
+        const PheromoneSignal &pheromone,
+        const float maxDetectionDistance,
+        const int maxRealtiveStrength)
+    {
+        // Calculate vector to pheromone
+        Core::Point directionToPheromone = pheromone.position - antPosition;
+        auto distance = antPosition.distanceTo(pheromone.position);
+
+        if (distance > maxDetectionDistance)
+            return 0.0f;
+
+        // 1. Direction component - how aligned is ant's movement with pheromone direction?
+        Core::Point normalizedDirection = directionToPheromone;
+        if (distance > 0)
+        {
+            normalizedDirection.x /= distance;
+            normalizedDirection.y /= distance;
+        }
+
+        Core::Point normalizedVelocity = antVelocity;
+        auto velocityMagnitude = std::sqrt(antVelocity.x * antVelocity.x + antVelocity.y * antVelocity.y);
+        if (velocityMagnitude > 0)
+        {
+            normalizedVelocity.x /= velocityMagnitude;
+            normalizedVelocity.y /= velocityMagnitude;
+        }
+
+        // Dot product: 1 if same direction, -1 if opposite
+        auto directionAlignment = normalizedDirection.x * normalizedVelocity.x +
+                                  normalizedDirection.y * normalizedVelocity.y;
+
+        // Remap from [-1, 1] to [0.5, 1.5]
+        auto directionComponent = 1.0f + (directionAlignment * 0.5f);
+
+        // 2. Distance component - closer pheromones are more attractive
+        auto distanceComponent = 1.0f - (distance / maxDetectionDistance);
+
+        // 3. Strength component - stronger pheromones are more attractive
+        auto relativeStrength = static_cast<float>(pheromone.excitement) / maxRealtiveStrength;
+        auto strengthComponent = std::min(0.5f, relativeStrength);
+
+        // Combine components and ensure result is in [0, 2]
+        auto attraction = directionComponent * distanceComponent * strengthComponent * 2.0f;
+        return std::min(2.0f, std::max(0.0f, attraction));
     }
 }

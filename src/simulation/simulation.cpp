@@ -7,6 +7,7 @@ namespace AntColony::Simulation
     constexpr auto COLONY_SIZE = 0.5f;
     constexpr auto ANT_SIZE = 0.05f;
     constexpr auto FOOD_SIZE = 0.05f;
+    constexpr auto PHEROMONE_SIZE = 0.01f;
 
     const float LEFT_BOUNDARY = -0.95f;
     const float RIGHT_BOUNDARY = 0.95f;
@@ -17,10 +18,17 @@ namespace AntColony::Simulation
               Core::Point(0.0f, 0.0f),
               COLONY_SIZE,
               FOOD_SIZE,
-              ANT_SIZE) {}
+              ANT_SIZE,
+              PHEROMONE_SIZE) {}
 
-    Simulation::Simulation(Core::ViewPort viewPort, Core::Point colonyCenter, float colonySize, float foodSize, float antSize)
-        : colony(colonyCenter, colonySize), foodManager(colonyCenter, colonySize, foodSize, viewPort), antManager(viewPort)
+    Simulation::Simulation(Core::ViewPort viewPort, Core::Point colonyCenter, float colonySize, float foodSize, float antSize, float pheromoneSize)
+        : colony(colonyCenter, colonySize),
+          foodManager(colonyCenter,
+                      colonySize,
+                      foodSize,
+                      viewPort),
+          antManager(viewPort),
+          pheromoneManager(pheromoneSize)
     {
         antManager.spawnAnts(colony, antSize);
     }
@@ -28,16 +36,19 @@ namespace AntColony::Simulation
     void Simulation::update(const Render::FrameContext &ctx)
     {
         const auto &food = foodManager.getFoodParticles();
-        antManager.update(colony, food);
+        const auto &pheromones = pheromoneManager.getPheromones();
+        auto poisitions = antManager.update(colony, food, pheromones);
+        pheromoneManager.update(poisitions);
         foodManager.update();
     }
 
     void Simulation::render(const Render::FrameContext &ctx) const
     {
-        auto &render = ctx.getRenderer();
+        auto &renderer = ctx.getRenderer();
 
-        colony.render(render);
-        antManager.render(render);
-        foodManager.render(render);
+        colony.render(renderer);
+        antManager.render(renderer);
+        foodManager.render(renderer);
+        pheromoneManager.render(renderer);
     }
 }

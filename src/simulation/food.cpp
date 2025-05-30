@@ -1,8 +1,4 @@
 #include "food.hpp"
-#include "baseEntity.hpp"
-
-#include "../core/point.hpp"
-#include "../core/color.hpp"
 
 namespace AntColony::Simulation
 {

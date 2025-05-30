@@ -14,6 +14,6 @@ namespace AntColony::Simulation
 
         Core::Point position;
         unsigned int mainColor;
-        float entitySize;
+        const float entitySize;
     };
 }

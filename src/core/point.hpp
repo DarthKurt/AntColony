@@ -13,6 +13,7 @@ namespace AntColony::Core
 
         Point operator+(const Point &other) const;
         Point operator*(const float scalar) const;
+        Point operator-(const Point &other) const;
         Point &operator+=(const Point &other);
         Point &operator*=(const float scalar);
         float distanceTo(const Point &other) const;
