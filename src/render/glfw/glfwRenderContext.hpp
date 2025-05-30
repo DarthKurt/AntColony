@@ -1,21 +1,21 @@
 #pragma once
-// MUST Be first to not conflict with GLFW
-#include <glad/glad.h>
-
 #include "../../core/logger.hpp"
 #include "../renderContext.hpp"
 #include "../renderer.hpp"
 #include "glRenderer.hpp"
 
 #include <memory>
+
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+#include <glad/glad.h>
 
 namespace AntColony::Render::GLFW
 {
     class GLFWRenderContext : public RenderContext
     {
     public:
-        GLFWRenderContext(std::shared_ptr<Core::Logger> logger);
+        explicit GLFWRenderContext(std::shared_ptr<Core::Logger> logger);
         ~GLFWRenderContext() override;
 
         // RenderContext

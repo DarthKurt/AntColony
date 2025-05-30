@@ -19,7 +19,7 @@ namespace AntColony::Simulation
     
         // Draw a frame and text
         renderer.drawFrame(position, length, entitySize, Core::Color(mainColor));
-        // renderer.drawText(position, countText, Core::Color(mainColor));
+        renderer.drawText(position, countText, Core::Color(mainColor));
     }
 
     void Counter::increment(int count)

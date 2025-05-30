@@ -28,5 +28,6 @@ target_link_libraries(
     glad
     OpenGL::GL
     stb
+    dejavu
 )
 message("Lib configuration done")

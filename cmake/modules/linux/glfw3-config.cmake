@@ -1,5 +1,6 @@
 if(NOT TARGET glfw)
 
+    set(GLFW_BUILD_WAYLAND "OFF")
     # Download GLFW release source from GitHub
     FetchContent_Declare(
         glfw-static

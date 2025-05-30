@@ -1,13 +1,17 @@
 #pragma once
 
-#include <string>
-#include <glad/glad.h>
-#include "../../core/point.hpp"
-#include "../../core/color.hpp"
-
 #include "../renderer.hpp"
 
-namespace AntColony::Render
+
+#include "../../core/point.hpp"
+#include "../../core/color.hpp"
+#include "text/font.hpp"
+
+#include <string>
+#include <glad/glad.h>
+#include <stb_truetype.h>
+
+namespace AntColony::Render::GLFW
 {
     class GLRenderer : public Renderer
     {
@@ -28,9 +32,13 @@ namespace AntColony::Render
         static const int numCircleSegments = 50;
 
         // Helper methods for shader creation and geometry initialization
-        GLuint compileShader(GLenum type, const char* src) const;
+        GLuint compileShader(GLenum type, const char *src) const;
         GLuint createShaderProgram() const;
         void initCircleGeometry();
+
+        Text::Font *loadFont(float fontSize) const;
+        void freeFont(Text::Font *font) const;
+        void drawTextCore(Text::Font *font, const char *text, float x, float y, float r, float g, float b) const;
 
         bool isInited;
     };
