@@ -15,6 +15,7 @@ target_link_libraries(
     PRIVATE
     AntColonySimLib
     glfw
+    freetype
     OpenGL::GL
     Catch2::Catch2WithMain
 )

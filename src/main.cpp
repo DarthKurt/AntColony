@@ -2,22 +2,22 @@
 #include "render/render.hpp"
 #include "render/renderEngines.hpp"
 #include "utils/randomGenerator.hpp"
+#include "utils/consoleLogger.hpp"
 
-using AntColony::Render::initRenderContext;
-using AntColony::Utils::RandomGenerator;
-using AntColony::Simulation::Simulation;
+#include "memory"
 
 int main()
 {
-    auto renderCtx = initRenderContext(AntColony::Render::OPENGL);
+    const auto logger = std::make_shared<AntColony::Utils::ConsoleLogger>();
+    auto renderCtx = AntColony::Render::initRenderContext(AntColony::Render::OPENGL, logger);
 
     if (!renderCtx->getInited())
         return -1;
 
     // Initialize the random generator with time-based seed
-    RandomGenerator::getInstance().seed();
+    AntColony::Utils::RandomGenerator::getInstance().seed();
 
-    Simulation simulation;
+    AntColony::Simulation::Simulation simulation(logger);
 
     while (!renderCtx->shouldClose())
     {

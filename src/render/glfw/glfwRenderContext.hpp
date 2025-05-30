@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../core/logger.hpp"
 #include "../renderContext.hpp"
 #include "../renderer.hpp"
 #include "glfwRenderer.hpp"
@@ -12,7 +13,7 @@ namespace AntColony::Render::GLFW
     class GLFWRenderContext : public RenderContext
     {
     public:
-        GLFWRenderContext();
+        GLFWRenderContext(std::shared_ptr<Core::Logger> logger);
         ~GLFWRenderContext() override;
 
         // RenderContext
@@ -22,6 +23,7 @@ namespace AntColony::Render::GLFW
         std::unique_ptr<FrameContext> getFrameContext() const override;
 
     private:
+        std::shared_ptr<Core::Logger> logger;
         bool isInited;
         GLFWwindow *window;
         GLFWRenderer renderer;
