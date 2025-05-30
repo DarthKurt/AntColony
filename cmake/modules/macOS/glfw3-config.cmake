@@ -1,4 +1,13 @@
 if(NOT TARGET glfw)
+
+    # Download GLFW release source from GitHub
+    FetchContent_Declare(
+        glfw-static
+        URL      https://github.com/glfw/glfw/releases/download/3.4/glfw-3.4.bin.MACOS.zip
+    )
+    # Ensure GLFW is downloaded and unpacked
+    FetchContent_MakeAvailable(glfw-static)
+
     # Create an imported static library target called glfw.
     add_library(glfw STATIC IMPORTED)
     # Set the imported location to the prebuilt static library;

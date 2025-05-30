@@ -1,4 +1,5 @@
 #include "render.hpp"
+
 #include "glfw/glfwRenderContext.hpp"
 
 #include <memory>

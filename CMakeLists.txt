@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 4.0.2 FATAL_ERROR)
 
 # Include core functions
 include(cmake/modules/core.cmake)
+include(FetchContent)
 
 # Auto-detect if not provided
 if(NOT TARGET_PLATFORM)
@@ -35,10 +36,16 @@ else()
     message(FATAL_ERROR "Unknown TARGET_PLATFORM '${TARGET_PLATFORM}'.")
 endif()
 
-project(AntColonySim LANGUAGES CXX)
+project(AntColonySim LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Set custom modules and libs in priority
+
+list(APPEND CMAKE_PREFIX_PATH_SWAP ${CMAKE_PREFIX_PATH})
+list(REMOVE_DUPLICATES CMAKE_PREFIX_PATH_SWAP)
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH_SWAP})
 
 message(STATUS "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
 message(STATUS "CMAKE_CXX_COMPILER: ${CMAKE_CXX_COMPILER}")

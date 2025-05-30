@@ -1,11 +1,40 @@
-find_package(OpenGL CONFIG REQUIRED)
-message(STATUS "OpenGL lib found")
+# Define the reusable macro
+macro(add_dependency target package shortname)
+    find_package("${package}" CONFIG REQUIRED)
+    message(STATUS "${target} dependency configured")
 
-find_package(glfw3 CONFIG REQUIRED)
-message(STATUS "GLFW found")
+    # Debug target settings
+    get_target_property(${shortname}_type ${target} TYPE)
+    message(STATUS "Library target '${target}' TYPE: ${${shortname}_type}")
 
-find_package(freetype CONFIG REQUIRED)
-message(STATUS "FreeType2 found")
+    get_target_property(${shortname}_iic ${target} INTERFACE_INCLUDE_DIRECTORIES)
+    message(STATUS "Library target '${target}' INTERFACE_INCLUDE_DIRECTORIES: ${${shortname}_iic}")
 
-find_package(Catch2 CONFIG REQUIRED)
-message(STATUS "Catch2 found")
+    get_target_property(${shortname}_ic ${target} INCLUDE_DIRECTORIES)
+    message(STATUS "Library target '${target}' INCLUDE_DIRECTORIES: ${${shortname}_ic}")
+
+    get_target_property(${shortname}_imports ${target} IMPORTED_LOCATION)
+    message(STATUS "Library target '${target}' IMPORTED_LOCATION: ${${shortname}_imports}")
+
+    get_target_property(${shortname}_icfg ${target} IMPORTED_CONFIGURATIONS)
+    message(STATUS "Library target '${target}' IMPORTED_CONFIGURATIONS: ${${shortname}_icfg}")
+
+    get_target_property(${shortname}_link_libs ${target} INTERFACE_LINK_LIBRARIES)
+    message(STATUS "Library target '${target}' INTERFACE_LINK_LIBRARIES: ${${shortname}_link_libs}")
+    
+    get_target_property(${shortname}_compile_defs ${target} INTERFACE_COMPILE_DEFINITIONS)
+    message(STATUS "Library target '${target}' INTERFACE_COMPILE_DEFINITIONS: ${${shortname}_compile_defs}")
+    
+    get_target_property(${shortname}_compile_opts ${target} INTERFACE_COMPILE_OPTIONS)
+    message(STATUS "Library target '${target}' INTERFACE_COMPILE_OPTIONS: ${${shortname}_compile_opts}")
+    
+    get_target_property(${shortname}_version ${target} VERSION)
+    message(STATUS "Library target '${target}' VERSION: ${${shortname}_version}")
+endmacro()
+
+# set(CMAKE_FIND_DEBUG_MODE 1)
+add_dependency("OpenGL::GL" "OpenGL" "gl")
+add_dependency("glfw" "glfw3" "glfw")
+add_dependency("glad" "glad" "glad")
+add_dependency("stb" "stb" "stb")
+# add_dependency("Catch2::Catch2WithMain" "Catch2" "Catch2")

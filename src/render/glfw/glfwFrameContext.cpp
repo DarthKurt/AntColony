@@ -1,5 +1,5 @@
 #include "../renderer.hpp"
-#include "glfwRenderer.hpp"
+#include "glRenderer.hpp"
 #include "glfwFrameContext.hpp"
 
 #include <thread>
@@ -7,7 +7,7 @@
 
 namespace AntColony::Render::GLFW
 {
-    GLFWFrameContext::GLFWFrameContext(GLFWwindow *window, float frameRate, const GLFWRenderer &renderer)
+    GLFWFrameContext::GLFWFrameContext(GLFWwindow *window, float frameRate, const GLRenderer &renderer)
         : window(window), renderer(renderer), frameRate(frameRate), startTime(std::chrono::steady_clock::now())
     {
     }

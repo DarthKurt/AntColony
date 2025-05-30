@@ -78,20 +78,12 @@ endif()
 
 # set(CMAKE_FIND_DEBUG_MODE ON)
 set(OSXCROSS_FRAMEWORKS_DIR "${OSXCROSS_SDK}/System/Library/Frameworks")
+set(CMAKE_MODULES_DIR "${CMAKE_SOURCE_DIR}/cmake/modules/macOS")
 
-list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/cmake/modules/macOS/")
+set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/cmake/modules/common/" "${CMAKE_MODULES_DIR}/" "${CMAKE_PREFIX_PATH}")
 list(APPEND CMAKE_PREFIX_PATH "${OSXCROSS_MACPORTS_DIR}/pkgs/opt/local/lib/cmake/")
 list(APPEND CMAKE_PREFIX_PATH "${OSXCROSS_MACPORTS_DIR}/pkgs/opt/local/share/cmake/")
-
-include(FetchContent)
-
-# Download GLFW release source from GitHub
-FetchContent_Declare(
-    glfw-static
-    URL      https://github.com/glfw/glfw/releases/download/3.4/glfw-3.4.bin.MACOS.zip
-)
-# Ensure GLFW is downloaded and unpacked
-FetchContent_MakeAvailable(glfw-static)
+set(CMAKE_PREFIX_PATH_SWAP "${CMAKE_PREFIX_PATH}")
 
 set(TOOLCHAIN_PREFIX "${OSXCROSS_TARGET_ARCH}-apple-${OSXCROSS_TARGET}")
 set(CMAKE_C_COMPILER "${OSXCROSS_CCTOOLS_PATH}/${TOOLCHAIN_PREFIX}-clang")

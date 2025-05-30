@@ -246,6 +246,7 @@ namespace AntColony::Simulation
 
     bool AntManager::updateAnt(
         const Colony &colony,
+        Counter &foodCounter,
         const std::vector<std::shared_ptr<Food>> &food,
         const std::vector<PheromoneSignal> &incomingSignals,
         const float maxPheromoneDetectionDistance,
@@ -323,6 +324,7 @@ namespace AntColony::Simulation
                 if (checkCollision(newPosition, colonyPosition, antSize, colonySize))
                 {
                     ant.dropFood();
+                    foodCounter.increment();
                 }
 
                 // Update position and return early
@@ -360,6 +362,7 @@ namespace AntColony::Simulation
                 if (checkCollision(newPosition, colonyPosition, antSize, colonySize))
                 {
                     ant.dropFood();
+                    foodCounter.increment();
                 }
 
                 // Update position and break out of retry loop
@@ -373,6 +376,7 @@ namespace AntColony::Simulation
 
     std::stack<PheromoneSignal> AntManager::update(
         const Colony &colony,
+        Counter &foodCounter,
         const std::vector<std::shared_ptr<Food>> &food,
         const std::vector<PheromoneSignal> &incomingSignals)
     {
@@ -391,12 +395,12 @@ namespace AntColony::Simulation
             });
 
         const auto maxPheromoneRealtiveStrength = strongestPheromone == incomingSignals.end()
-                                                 ? 0
-                                                 : strongestPheromone->excitement;
+                                                      ? 0
+                                                      : strongestPheromone->excitement;
 
         for (auto i = 0; i < ants.size(); i++)
         {
-            if (updateAnt(colony, food, incomingSignals, maxPheromonAffectDistance, maxPheromoneRealtiveStrength, i))
+            if (updateAnt(colony, foodCounter, food, incomingSignals, maxPheromonAffectDistance, maxPheromoneRealtiveStrength, i))
             {
                 const auto signal = ants[i].consumePheromoneCharge();
                 outcomingSignals.push(signal);

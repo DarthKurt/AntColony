@@ -24,8 +24,9 @@ target_sources(
 target_link_libraries(
     AntColonySimLib
     PRIVATE
-    freetype
     glfw
+    glad
     OpenGL::GL
+    stb
 )
 message("Lib configuration done")

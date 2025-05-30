@@ -5,6 +5,7 @@ target_link_libraries(
     PRIVATE
     AntColonySimLib
     glfw
-    freetype
+    glad
     OpenGL::GL
+    stb
 )

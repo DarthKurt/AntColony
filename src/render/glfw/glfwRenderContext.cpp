@@ -1,18 +1,17 @@
 #include "glfwRenderContext.hpp"
 #include "glfwFrameContext.hpp"
-#include "glfwRenderer.hpp"
+#include "glRenderer.hpp"
 #include "constants.hpp"
 
 #include <iostream>
 #include <sstream>
-#include <GLFW/glfw3.h>
-#include <ft2build.h>
-#include FT_FREETYPE_H
+#include <vector>
+#include <stb_truetype.h>
 
 namespace AntColony::Render::GLFW
 {
     GLFWRenderContext::GLFWRenderContext(std::shared_ptr<Core::Logger> logger)
-        : logger(logger), isInited(false), window(nullptr), renderer(nullptr) {}
+        : logger(logger), isInited(false), window(nullptr), renderer() {}
 
     void GLFWRenderContext::init()
     {
@@ -22,13 +21,17 @@ namespace AntColony::Render::GLFW
             window = nullptr;
         }
 
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
         logger->debug("GLFW initialized");
 
         const auto *title = "Ant Colony Simulation";
         const auto windowWidth = 1280;
         const auto windowHeight = 720;
 
-        GLFWwindow *w = glfwCreateWindow(windowWidth, windowHeight, title, NULL, NULL);
+        auto *w = glfwCreateWindow(windowWidth, windowHeight, title, NULL, NULL);
         if (!w)
         {
             logger->error("Failed to create GLFW window");
@@ -41,20 +44,25 @@ namespace AntColony::Render::GLFW
         logger->debug(oss.str());
 #endif
 
-        FT_Library ft;
-        if (FT_Init_FreeType(&ft))
+        // Make the window's context current
+        glfwMakeContextCurrent(w);
+
+        // Initialize GLAD
+        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         {
-            logger->error("Failed to initialize FreeType");
+            logger->error("Failed to initialize GLAD");
             glfwTerminate();
             window = nullptr;
+            return;
         }
-        logger->debug("FreeType initialized successfully");
-        FT_Done_FreeType(ft);
 
-        glfwMakeContextCurrent(w);
+        // Set viewport
+        glViewport(0, 0, windowWidth, windowHeight);
+
+        // Set callback for window resize
         glfwSetFramebufferSizeCallback(w, framebufferSizeCallback);
         window = w;
-        renderer = GLFWRenderer(window);
+        renderer.init();
         isInited = true;
     }
 
@@ -63,11 +71,7 @@ namespace AntColony::Render::GLFW
 
     void GLFWRenderContext::framebufferSizeCallback(GLFWwindow *window, int width, int height)
     {
-        float aspectRatio = (float)width / (float)height;
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glOrtho(-aspectRatio, aspectRatio, -1.0, 1.0, -1.0, 1.0);
-        glMatrixMode(GL_MODELVIEW);
+        glViewport(0, 0, width, height);
     }
 
     std::unique_ptr<FrameContext> GLFWRenderContext::getFrameContext() const
@@ -80,4 +84,23 @@ namespace AntColony::Render::GLFW
         glfwDestroyWindow(window);
         glfwTerminate();
     }
+
+    // bool initFont(const char *fontPath)
+    // {
+    //     std::ifstream file(fontPath, std::ios::binary | std::ios::ate);
+    //     if (!file)
+    //         return false;
+
+    //     std::streamsize size = file.tellg();
+    //     file.seekg(0, std::ios::beg);
+    //     std::vector<unsigned char> buffer(size);
+    //     if (!file.read(reinterpret_cast<char *>(buffer.data()), size))
+    //         return false;
+
+    //     stbtt_fontinfo fontInfo;
+    //     if (!stbtt_InitFont(&fontInfo, buffer.data(), 0))
+    //         return false;
+
+    //     return true;
+    // }
 }
