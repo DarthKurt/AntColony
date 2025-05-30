@@ -1,12 +1,14 @@
 #pragma once
+// MUST Be first to not conflict with GLFW
+#include <glad/glad.h>
 
 #include "../../core/logger.hpp"
 #include "../renderContext.hpp"
 #include "../renderer.hpp"
-#include "glfwRenderer.hpp"
+#include "glRenderer.hpp"
 
-#include <GLFW/glfw3.h>
 #include <memory>
+#include <GLFW/glfw3.h>
 
 namespace AntColony::Render::GLFW
 {
@@ -26,7 +28,7 @@ namespace AntColony::Render::GLFW
         std::shared_ptr<Core::Logger> logger;
         bool isInited;
         GLFWwindow *window;
-        GLFWRenderer renderer;
+        GLRenderer renderer;
 
         static void framebufferSizeCallback(GLFWwindow *window, int width, int height);
     };

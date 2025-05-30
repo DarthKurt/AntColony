@@ -5,6 +5,7 @@
 #include "food.hpp"
 #include "baseEntityManager.hpp"
 #include "pheromoneSignal.hpp"
+#include "counter.hpp"
 
 #include "../core/logger.hpp"
 #include "../core/viewPort.hpp"
@@ -51,6 +52,7 @@ namespace AntColony::Simulation
          */
         std::stack<PheromoneSignal> update(
             const Colony &colony,
+            Counter &foodCounter,
             const std::vector<std::shared_ptr<Food>> &food,
             const std::vector<PheromoneSignal> &incomingSignals);
 
@@ -125,6 +127,7 @@ namespace AntColony::Simulation
          * @return                  True if pheromone should be spawn
          */
         bool updateAnt(const Colony &colony,
+                       Counter &foodCounter,
                        const std::vector<std::shared_ptr<Food>> &food,
                        const std::vector<PheromoneSignal> &incomingSignals,
                        const float maxPheromoneDetectionDistance,
