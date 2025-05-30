@@ -9,6 +9,7 @@ namespace AntColony::Simulation
           pheromoneExcitement(0),
           pheromoneCharge(0),
           pheromoneChargeThreshold(pheromoneThreshold) {}
+
     Ant::Ant(Core::Point position, Core::Point velocity, float size, int pheromoneThreshold)
         : BaseEntity(position, 0xfc6203, size),
           velocity(velocity),

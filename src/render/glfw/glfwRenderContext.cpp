@@ -4,26 +4,52 @@
 #include "constants.hpp"
 
 #include <iostream>
+#include <sstream>
 #include <GLFW/glfw3.h>
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 namespace AntColony::Render::GLFW
 {
-    GLFWRenderContext::GLFWRenderContext() : isInited(false), window(nullptr), renderer(nullptr) {}
+    GLFWRenderContext::GLFWRenderContext(std::shared_ptr<Core::Logger> logger)
+        : logger(logger), isInited(false), window(nullptr), renderer(nullptr) {}
 
     void GLFWRenderContext::init()
     {
         if (!glfwInit())
         {
-            std::cerr << "Failed to initialize GLFW" << std::endl;
+            logger->error("Failed to initialize GLFW");
             window = nullptr;
         }
 
-        GLFWwindow *w = glfwCreateWindow(600, 600, "Ant Colony Simulation", NULL, NULL);
+        logger->debug("GLFW initialized");
+
+        const auto *title = "Ant Colony Simulation";
+        const auto windowWidth = 1280;
+        const auto windowHeight = 720;
+
+        GLFWwindow *w = glfwCreateWindow(windowWidth, windowHeight, title, NULL, NULL);
         if (!w)
         {
-            std::cerr << "Failed to create GLFW window" << std::endl;
+            logger->error("Failed to create GLFW window");
             glfwTerminate();
         }
+
+#ifndef NO_DEBUG
+        std::ostringstream oss;
+        oss << "GLFW Window (Title: '" << title << "', " << windowWidth << "x" << windowHeight << ") initialized";
+        logger->debug(oss.str());
+#endif
+
+        FT_Library ft;
+        if (FT_Init_FreeType(&ft))
+        {
+            logger->error("Failed to initialize FreeType");
+            glfwTerminate();
+            window = nullptr;
+        }
+        logger->debug("FreeType initialized successfully");
+        FT_Done_FreeType(ft);
 
         glfwMakeContextCurrent(w);
         glfwSetFramebufferSizeCallback(w, framebufferSizeCallback);

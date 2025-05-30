@@ -12,7 +12,7 @@ namespace AntColony::Render::GLFW
 
     GLFWRenderer::~GLFWRenderer() {}
 
-    void GLFWRenderer::drawCircleInPosition(Core::Point position, float radius, Core::Color color) const
+    void GLFWRenderer::drawCircleInPosition(const Core::Point &position, const float radius, const Core::Color &color) const
     {
         // Get viewport dimensions in pixels
         int width, height;

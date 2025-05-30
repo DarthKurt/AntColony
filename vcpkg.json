@@ -8,12 +8,20 @@
             "name": "glfw3",
             "version>=": "3.4#1"
         },
+        {
+            "name": "freetype",
+            "version>=": "2.13.2#1"
+        },
         "catch2"
     ],
     "overrides": [
         {
             "name": "glfw3",
             "version": "3.4#1"
+        },
+        {
+            "name": "freetype",
+            "version": "2.13.2#1"
         }
     ]
 }

@@ -24,6 +24,7 @@ target_sources(
 target_link_libraries(
     AntColonySimLib
     PRIVATE
+    freetype
     glfw
     OpenGL::GL
 )
