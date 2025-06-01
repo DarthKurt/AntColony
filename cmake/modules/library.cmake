@@ -14,7 +14,7 @@ pretty_print_files("Utils sources" UTILS_SOURCES)
 
 target_sources(
     AntColonySimLib
-    PUBLIC
+    PRIVATE
     ${CORE_SOURCES}
     ${RENDER_SOURCES}
     ${SIMULATION_SOURCES}
@@ -30,4 +30,11 @@ target_link_libraries(
     stb
     dejavu
 )
+
+target_include_directories(
+    AntColonySimLib
+    PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
 message("Lib configuration done")

@@ -5,14 +5,12 @@
 #include "core/color.hpp"
 #include "utils/consoleLogger.hpp"
 
-#include <GLFW/glfw3.h>
-#include <glad/glad.h>
 #include <memory>
 #include <iostream>
 #include <thread>
 #include <chrono>
 
-constexpr auto FRAME_RATE = 1000.0f / 5.0f;
+constexpr auto FRAME_RATE = 1000.0f / 0.5f;
 
 /**
  * @brief Main function to test text rendering with GLRenderer.
@@ -74,7 +72,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Render text at position (100, 100) with white color
-        renderer->drawText(AntColony::Core::Point{100.0f, 100.0f}, "Hello, World!", AntColony::Core::Color(0x7d4827));
+        renderer->drawText(AntColony::Core::Point{100.0f, 100.0f}, "Hello, World!\n\tIt's a beautiful day!", AntColony::Core::Color(0x7d4827), 32.0f);
 
         // Swap buffers and poll events
         glfwSwapBuffers(window);

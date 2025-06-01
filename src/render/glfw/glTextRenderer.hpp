@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 #include "_gl.hpp"
+#include <unordered_map>
 
 namespace AntColony::Render::GLFW
 {
@@ -28,7 +29,7 @@ namespace AntColony::Render::GLFW
         ~GLTextRenderer();
 
         /**
-         * @brief Initializes shaders and geometry for rendering.
+         * @brief Initializes shaders for rendering.
          */
         void init();
 
@@ -37,8 +38,9 @@ namespace AntColony::Render::GLFW
          * @param position Top-left position for text rendering.
          * @param text String to render.
          * @param color RGB color of the text.
+         * @param fontSize Size of the font.
          */
-        void drawText(const Core::Point &position, const std::string &text, const Core::Color &color) const;
+        void drawText(const Core::Point &position, const std::string &text, const Core::Color &color, const float fontSize);
 
     private:
         /// @brief Shared pointer to the shader provider.
@@ -47,6 +49,10 @@ namespace AntColony::Render::GLFW
         std::shared_ptr<AntColony::Core::Logger> logger;
         /// @brief Shader program for rendering shapes (circles, frames).
         GLuint textShaderProgram;
+        /// @brief Shader program for rendering shapes (circles, frames).
+        std::unique_ptr<Text::Font> font; // New: Store font for reuse
+
+        std::unordered_map<float, std::shared_ptr<Text::Font>> fontCache;
         /// @brief Tracks initialization state.
         bool isInited;
 
@@ -55,7 +61,7 @@ namespace AntColony::Render::GLFW
          * @param fontSize Size of the font in pixels.
          * @return Unique pointer to the loaded font structure, or nullptr on failure.
          */
-        std::unique_ptr<Text::Font> loadFont(float fontSize) const;
+        std::shared_ptr<Text::Font> loadFont(float fontSize) const;
 
         /**
          * @brief Core text rendering function.
@@ -69,7 +75,7 @@ namespace AntColony::Render::GLFW
          * @param winWidth Window width for orthographic projection.
          * @param winHeight Window height for orthographic projection.
          */
-        void drawTextCore(const Text::Font &font, const char *text, float x, float y, float r, float g, float b, float winWidth, float winHeight) const;
+        void drawTextCore(const std::shared_ptr<Text::Font> font, const char *text, float x, float y, float r, float g, float b, float winWidth, float winHeight) const;
 
         static bool isSpecialChar(const char * c);
     };
