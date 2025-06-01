@@ -6,7 +6,4 @@ target_link_libraries(
     AntColonySimLib
     glfw
     glad
-    OpenGL::GL
-    stb
-    dejavu
 )
