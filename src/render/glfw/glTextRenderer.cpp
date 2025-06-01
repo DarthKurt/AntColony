@@ -17,6 +17,22 @@
 
 namespace AntColony::Render::GLFW
 {
+    // ASCII
+    constexpr const auto TAB_CHAR = 9;
+    constexpr const auto LINE_FEED_CHAR = 10;
+    constexpr const auto RETURN_CHAR = 13;
+    constexpr const auto SPACE_CHAR = 32;
+
+    constexpr const auto TAB_SIZE = 4.0f;
+
+    // TEXTURE
+    constexpr const auto TEXTURE_SIZE = 512;
+
+    bool GLTextRenderer::isSpecialChar(const char *c)
+    {
+        return *c == TAB_CHAR || *c == LINE_FEED_CHAR || *c == RETURN_CHAR || *c == SPACE_CHAR;
+    }
+
     GLTextRenderer::GLTextRenderer(std::shared_ptr<GLShaderProvider> shaderProvider, std::shared_ptr<AntColony::Core::Logger> logger)
         : shaderProvider(shaderProvider), logger(logger), isInited(false) {}
 
@@ -66,7 +82,7 @@ namespace AntColony::Render::GLFW
         }
         int winWidth, winHeight;
         glfwGetFramebufferSize(glfwGetCurrentContext(), &winWidth, &winHeight);
-        drawTextCore(*font, text.c_str(), 640.0f, 360.0f, color.r, color.g, color.b, static_cast<float>(winWidth), static_cast<float>(winHeight));
+        drawTextCore(*font, text.c_str(), position.x, position.y, color.r, color.g, color.b, static_cast<float>(winWidth), static_cast<float>(winHeight));
     }
 
     std::unique_ptr<Text::Font> GLTextRenderer::loadFont(float fontSize) const
@@ -85,8 +101,8 @@ namespace AntColony::Render::GLFW
         stbtt_GetFontVMetrics(&font->font, &font->ascent, &font->descent, &font->lineGap);
         font->lineHeight = (font->ascent - font->descent + font->lineGap) * font->scale;
 
-        font->w = 512;
-        font->h = 512;
+        font->w = TEXTURE_SIZE;
+        font->h = TEXTURE_SIZE;
         font->bitmap = new unsigned char[font->w * font->h]();
         if (!font->bitmap)
         {
@@ -120,7 +136,7 @@ namespace AntColony::Render::GLFW
                 pos_y += max_height + 1;
                 max_height = 0;
             }
-            unsigned char *glyph_bitmap = stbtt_GetCodepointBitmap(&font->font, font->scale, font->scale, c, &w, &h, 0, 0);
+            auto *glyph_bitmap = stbtt_GetCodepointBitmap(&font->font, font->scale, font->scale, c, &w, &h, 0, 0);
             if (!glyph_bitmap)
             {
                 logger->error("Failed to generate glyph bitmap for character: " + std::to_string(c));
@@ -190,7 +206,9 @@ namespace AntColony::Render::GLFW
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         std::vector<float> vertices;
-        float cursor_x = x;
+        auto cursor_x = x;
+        auto cursor_y = y;
+
         int renderedGlyphs = 0;
         for (const char *c = text; *c; c++)
         {
@@ -199,14 +217,47 @@ namespace AntColony::Render::GLFW
                 logger->error("Glyph not found for character: " + std::string(1, *c));
                 continue;
             }
+
             const auto &glyph = font.glyphCache.at(*c);
             int w = glyph.x1 - glyph.x0, h = glyph.y1 - glyph.y0;
-            if (*c == 32)
+
+            // Handle space, tab, line feed, carriage return
+            if (isSpecialChar(c))
             {
-                cursor_x += glyph.advance;
+                switch (*c)
+                {
+                case TAB_CHAR:
+                    cursor_x += static_cast<float>(glyph.advance) * font.scale * TAB_SIZE;
+                    logger->debug("Tab: advance=" + std::to_string(static_cast<float>(glyph.advance) * font.scale * TAB_SIZE));
+                    break;
+                case LINE_FEED_CHAR:
+                    cursor_x = x;
+                    cursor_y += font.lineHeight;
+                    logger->debug("Line feed: cursor_y=" + std::to_string(cursor_y));
+                    break;
+                case RETURN_CHAR:
+                    cursor_x = x;
+                    logger->debug("Carriage return: cursor_x=" + std::to_string(cursor_x));
+                    break;
+                case SPACE_CHAR:
+                    cursor_x += static_cast<float>(glyph.advance) * font.scale;
+                    logger->debug("Space: advance=" + std::to_string(static_cast<float>(glyph.advance) * font.scale));
+                    break;
+                default:
+                    if (*c < 32 || *c == 127)
+                    {
+                        logger->debug("Skipping unprintable: ASCII " + std::to_string(static_cast<int>(*c)));
+                    }
+                    else
+                    {
+                        // Render printable glyph
+                    }
+                    break;
+                }
                 renderedGlyphs++;
                 continue;
             }
+
             if (w <= 0 || h <= 0)
             {
                 logger->error("Invalid glyph dimensions for character: " + std::string(1, *c));
@@ -218,7 +269,7 @@ namespace AntColony::Render::GLFW
             float v1 = static_cast<float>(glyph.tex_y + h) / font.h;
 
             float posX = cursor_x;
-            float posY = y - h / 2.0f; // Center vertically
+            float posY = cursor_y - h / 2.0f; // Center vertically
             float posX2 = posX + w;
             float posY2 = posY + h;
 
@@ -233,7 +284,7 @@ namespace AntColony::Render::GLFW
             vertices.insert(vertices.end(), {posX2, posY2, u1, v1});
             vertices.insert(vertices.end(), {posX, posY2, u0, v1});
 
-            cursor_x += glyph.advance;
+            cursor_x += static_cast<float>(glyph.advance) * font.scale;
             renderedGlyphs++;
         }
         logger->debug("Prepared " + std::to_string(renderedGlyphs) + " glyphs for rendering");
