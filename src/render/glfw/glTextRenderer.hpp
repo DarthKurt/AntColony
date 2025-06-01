@@ -70,5 +70,7 @@ namespace AntColony::Render::GLFW
          * @param winHeight Window height for orthographic projection.
          */
         void drawTextCore(const Text::Font &font, const char *text, float x, float y, float r, float g, float b, float winWidth, float winHeight) const;
+
+        static bool isSpecialChar(const char * c);
     };
 }
