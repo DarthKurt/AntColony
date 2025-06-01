@@ -1,4 +1,5 @@
 #include "viewPort.hpp"
+#include "point.hpp"
 
 namespace AntColony::Core
 {

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "../core/point.hpp"
-#include "../core/color.hpp"
+#include "../core/_fwd.hpp"
 
 #include <string>
 

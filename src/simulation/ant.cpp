@@ -1,5 +1,8 @@
 #include "ant.hpp"
 
+#include "../core/point.hpp"
+#include "../core/color.hpp"
+
 namespace AntColony::Simulation
 {
     Ant::Ant(Core::Point position, float size, int pheromoneThreshold)

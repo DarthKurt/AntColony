@@ -1,18 +1,32 @@
-#include "glfwRenderContext.hpp"
-#include "glfwFrameContext.hpp"
 #include "glRenderer.hpp"
+#include "glRenderContext.hpp"
+#include "glShaderProvider.hpp"
+#include "glfwFrameContext.hpp"
 #include "constants.hpp"
 
+#include "../../core/logger.hpp"
+
+#include <string>
+
+#include <vector>
 #include <iostream>
 #include <sstream>
-#include <vector>
 
 namespace AntColony::Render::GLFW
 {
-    GLFWRenderContext::GLFWRenderContext(std::shared_ptr<Core::Logger> logger)
-        : logger(logger), isInited(false), window(nullptr), renderer() {}
 
-    void GLFWRenderContext::init()
+    std::unique_ptr<RenderContext> GLRenderContext::getInstance(const std::shared_ptr<Core::Logger> logger)
+    {
+        return std::make_unique<GLRenderContext>(GLRenderContext(logger));
+    }
+
+    GLRenderContext::GLRenderContext(const std::shared_ptr<Core::Logger> logger)
+        : logger(logger),
+          isInited(false),
+          window(nullptr),
+          renderer(std::make_shared<GLRenderer>(std::make_shared<GLShaderProvider>(logger), logger)) {}
+
+    void GLRenderContext::init()
     {
         if (!glfwInit())
         {
@@ -37,11 +51,11 @@ namespace AntColony::Render::GLFW
             glfwTerminate();
         }
 
-#ifndef NO_DEBUG
-        std::ostringstream oss;
-        oss << "GLFW Window (Title: '" << title << "', " << windowWidth << "x" << windowHeight << ") initialized";
-        logger->debug(oss.str());
-#endif
+        logger->debug("GLFW Window (Title: '" +
+                      std::string(title) + "', " +
+                      std::to_string(windowWidth) + "x" +
+                      std::to_string(windowHeight) +
+                      ") initialized");
 
         // Make the window's context current
         glfwMakeContextCurrent(w);
@@ -61,24 +75,24 @@ namespace AntColony::Render::GLFW
         // Set callback for window resize
         glfwSetFramebufferSizeCallback(w, framebufferSizeCallback);
         window = w;
-        renderer.init();
+        renderer->init();
         isInited = true;
     }
 
-    bool GLFWRenderContext::getInited() const { return isInited; }
-    bool GLFWRenderContext::shouldClose() const { return glfwWindowShouldClose(window); }
+    bool GLRenderContext::getInited() const { return isInited; }
+    bool GLRenderContext::shouldClose() const { return glfwWindowShouldClose(window); }
 
-    void GLFWRenderContext::framebufferSizeCallback(GLFWwindow *window, int width, int height)
+    void GLRenderContext::framebufferSizeCallback(GLFWwindow *window, int width, int height)
     {
         glViewport(0, 0, width, height);
     }
 
-    std::unique_ptr<FrameContext> GLFWRenderContext::getFrameContext() const
+    std::unique_ptr<FrameContext> GLRenderContext::getFrameContext() const
     {
         return std::make_unique<GLFWFrameContext>(window, FRAME_RATE, renderer);
     }
 
-    GLFWRenderContext::~GLFWRenderContext()
+    GLRenderContext::~GLRenderContext()
     {
         glfwDestroyWindow(window);
         glfwTerminate();

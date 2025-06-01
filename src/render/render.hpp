@@ -8,5 +8,5 @@
 
 namespace AntColony::Render
 {
-    std::unique_ptr<RenderContext> initRenderContext(RENDER_ENGINE engine, std::shared_ptr<Core::Logger> logger);
+    extern std::unique_ptr<RenderContext> initRenderContext(RENDER_ENGINE engine, std::shared_ptr<Core::Logger> logger);
 }
