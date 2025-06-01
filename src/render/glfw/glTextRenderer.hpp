@@ -62,6 +62,71 @@ namespace AntColony::Render::GLFW
         std::shared_ptr<Text::Font> loadFont(float fontSize) const;
 
         /**
+         * @brief Factory method that initializes font structure with basic parameters.
+         * @param fontSize Size of the font in pixels.
+         * @param numberOfGlyphs Hint of how many glyphs will be stored in the font.
+         * @return Pointer to the loaded font structure.
+         */
+        static std::shared_ptr<Text::Font> createFont(float fontSize, int numberOfGlyphs);
+
+        /**
+         * @brief Initializes font metrics.
+         * @param font Font to initialize.
+         * @param fontData Binary data of the font.
+         * @param fontSize Size of the font in pixels.
+         * @return True if successful, false otherwise.
+         */
+        static bool tryInitializeFont(std::shared_ptr<Text::Font> font, const unsigned char *fontData, float fontSize);
+
+        /**
+         * @brief Allocates memory for the font bitmap.
+         * @param font Font to allocate bitmap for.
+         * @return True if successful, false otherwise.
+         */
+        static bool tryAllocateFontBitmap(std::shared_ptr<Text::Font> font);
+
+        /**
+         * @brief Generates glyphs for special characters (space, tab, newline, etc.).
+         * @param font Font to generate glyphs for.
+         * @param fontSize Size of the font in pixels.
+         */
+        void generateSpecialCharacterGlyphs(std::shared_ptr<Text::Font> font, float fontSize) const;
+
+        /**
+         * @brief Generates glyphs for regular characters.
+         * @param font Font to generate glyphs for.
+         * @param pos_x X position in the bitmap, updated as glyphs are added.
+         * @param pos_y Y position in the bitmap, updated as glyphs are added.
+         * @param max_height Maximum height of glyphs in the current row, updated as glyphs are added.
+         */
+        void generateRegularCharacterGlyphs(std::shared_ptr<Text::Font> font, int &pos_x, int &pos_y, int &max_height) const;
+
+        /**
+         * @brief Copies a glyph bitmap to the font bitmap.
+         * @param font Font to copy to.
+         * @param glyph_bitmap Source bitmap to copy from.
+         * @param pos_x X position in the destination bitmap.
+         * @param pos_y Y position in the destination bitmap.
+         * @param w Width of the glyph.
+         * @param h Height of the glyph.
+         */
+        static void copyGlyphToBitmap(std::shared_ptr<Text::Font> font, const unsigned char *glyph_bitmap, int pos_x, int pos_y, int w, int h);
+
+        /**
+         * @brief Validates that the font texture contains actual data.
+         * @param font Font to validate.
+         * @return True if valid, false otherwise.
+         */
+        bool validateFontTexture(std::shared_ptr<Text::Font> font) const;
+
+        /**
+         * @brief Creates an OpenGL texture from the font bitmap.
+         * @param font Font to create texture for.
+         * @return True if successful, false otherwise.
+         */
+        bool createFontTexture(std::shared_ptr<Text::Font> font) const;
+
+        /**
          * @brief Core text rendering function.
          * @param font Font to use for rendering.
          * @param text Text to render.
