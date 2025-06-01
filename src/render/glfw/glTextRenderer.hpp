@@ -50,8 +50,6 @@ namespace AntColony::Render::GLFW
         /// @brief Shader program for rendering shapes (circles, frames).
         GLuint textShaderProgram;
         /// @brief Shader program for rendering shapes (circles, frames).
-        std::unique_ptr<Text::Font> font; // New: Store font for reuse
-
         std::unordered_map<float, std::shared_ptr<Text::Font>> fontCache;
         /// @brief Tracks initialization state.
         bool isInited;

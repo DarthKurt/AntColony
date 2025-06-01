@@ -18,7 +18,7 @@ namespace AntColony::Render::GLFW
          * @brief Constructor with logger dependency.
          * @param logger Shared pointer to the logger instance.
          */
-        GLShaderProvider(const std::shared_ptr<Core::Logger> logger);
+        explicit GLShaderProvider(const std::shared_ptr<Core::Logger> logger);
 
         /**
          * @brief Default destructor.
