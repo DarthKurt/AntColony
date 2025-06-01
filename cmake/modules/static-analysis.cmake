@@ -8,3 +8,11 @@ if(CPP_CHECK)
         COMMENT "Running cppcheck static analysis"
     )
 endif()
+
+
+file(GLOB_RECURSE CPP_FILES src/*.cpp)
+add_custom_target(
+    "function-complexity"
+    COMMAND clang-tidy  "-checks=-*,readability-function-*" -p ${CMAKE_BINARY_DIR} ${CPP_FILES}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+)
