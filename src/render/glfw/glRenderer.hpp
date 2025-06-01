@@ -79,26 +79,5 @@ namespace AntColony::Render::GLFW
          * @brief Precomputes circle geometry using a triangle fan.
          */
         void initCircleGeometry();
-
-        /**
-         * @brief Loads a font with the specified size.
-         * @param fontSize Size of the font in pixels.
-         * @return Unique pointer to the loaded font structure, or nullptr on failure.
-         */
-        std::unique_ptr<Text::Font> loadFont(float fontSize) const;
-
-        /**
-         * @brief Core text rendering function.
-         * @param font Font to use for rendering.
-         * @param text Text to render.
-         * @param x X-coordinate for text position.
-         * @param y Y-coordinate for text position.
-         * @param r Red component of text color.
-         * @param g Green component of text color.
-         * @param b Blue component of text color.
-         * @param winWidth Window width for orthographic projection.
-         * @param winHeight Window height for orthographic projection.
-         */
-        void drawTextCore(const Text::Font &font, const char *text, float x, float y, float r, float g, float b, float winWidth, float winHeight) const;
     };
 }
