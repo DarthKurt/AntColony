@@ -112,39 +112,82 @@ namespace AntColony::Render::GLFW
 
     std::shared_ptr<Text::Font> GLTextRenderer::loadFont(float fontSize) const
     {
-        auto font = std::make_shared<Text::Font>();
-        font->size = fontSize;
-        font->spacing = 0.0f;
-        font->sdf = false;
-        font->glyphCache.reserve(MAX_ACII_CODE);
+        auto font = createFont(fontSize, MAX_ACII_CODE);
 
         logger->debug("Initializing font for size: " + std::to_string(fontSize));
-        if (!stbtt_InitFont(&font->font, MAIN_FONT, 0))
+        if (!tryInitializeFont(font, MAIN_FONT, fontSize))
         {
             logger->error("Failed to initialize font: Invalid font data or file");
             return nullptr;
         }
-
-        font->scale = stbtt_ScaleForPixelHeight(&font->font, fontSize);
-        stbtt_GetFontVMetrics(&font->font, &font->ascent, &font->descent, &font->lineGap);
-        font->lineHeight = (font->ascent - font->descent + font->lineGap) * font->scale;
         logger->debug("Font metrics: ascent=" + std::to_string(font->ascent) +
                       ", descent=" + std::to_string(font->descent) +
                       ", lineGap=" + std::to_string(font->lineGap) +
                       ", lineHeight=" + std::to_string(font->lineHeight));
 
-        font->w = TEXTURE_SIZE;
-        font->h = TEXTURE_SIZE;
-        font->bitmap = new unsigned char[font->w * font->h]();
-        if (!font->bitmap)
+        if (!tryAllocateFontBitmap(font))
         {
             logger->error("Failed to allocate bitmap for font texture");
             return nullptr;
         }
 
         int pos_x = 0, pos_y = 0, max_height = 0;
-        int glyphCount = 0;
 
+        generateSpecialCharacterGlyphs(font, fontSize);
+        generateRegularCharacterGlyphs(font, pos_x, pos_y, max_height);
+
+        if (!validateFontTexture(font))
+        {
+            return nullptr;
+        }
+
+        if (!createFontTexture(font))
+        {
+            return nullptr;
+        }
+
+        logger->debug("Font loaded successfully with size: " + std::to_string(fontSize));
+        return font;
+    }
+
+    std::shared_ptr<Text::Font> GLTextRenderer::createFont(float fontSize, int numberOfGlyphs)
+    {
+        auto font = std::make_shared<Text::Font>();
+        font->size = fontSize;
+        font->spacing = 0.0f;
+        font->sdf = false;
+        font->glyphCache.reserve(numberOfGlyphs);
+
+        return font;
+    }
+
+    bool GLTextRenderer::tryInitializeFont(std::shared_ptr<Text::Font> font, const unsigned char *fontData, float fontSize)
+    {
+        if (!stbtt_InitFont(&font->font, fontData, 0))
+        {
+            return false;
+        }
+
+        font->scale = stbtt_ScaleForPixelHeight(&font->font, fontSize);
+        stbtt_GetFontVMetrics(&font->font, &font->ascent, &font->descent, &font->lineGap);
+        font->lineHeight = (font->ascent - font->descent + font->lineGap) * font->scale;
+        return true;
+    }
+
+    bool GLTextRenderer::tryAllocateFontBitmap(std::shared_ptr<Text::Font> font)
+    {
+        font->w = TEXTURE_SIZE;
+        font->h = TEXTURE_SIZE;
+        font->bitmap = new unsigned char[font->w * font->h]();
+        if (!font->bitmap)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    void GLTextRenderer::generateSpecialCharacterGlyphs(std::shared_ptr<Text::Font> font, float fontSize) const
+    {
         for (int c : {SPACE_CHAR, TAB_CHAR, LINE_FEED_CHAR, RETURN_CHAR})
         {
             Text::GlyphInfo info{};
@@ -175,7 +218,6 @@ namespace AntColony::Render::GLFW
             }
 
             font->glyphCache[c] = info;
-            glyphCount++;
             std::string charName;
             switch (c)
             {
@@ -194,7 +236,10 @@ namespace AntColony::Render::GLFW
             }
             logger->debug("Special char '" + charName + "' advance=" + std::to_string(info.advance));
         }
+    }
 
+    void GLTextRenderer::generateRegularCharacterGlyphs(std::shared_ptr<Text::Font> font, int &pos_x, int &pos_y, int &max_height) const
+    {
         for (auto c = SPACE_CHAR + 1; c < MAX_ACII_CODE; c++)
         {
             Text::GlyphInfo info{};
@@ -206,14 +251,14 @@ namespace AntColony::Render::GLFW
             {
                 logger->warning("Invalid advance for char '" + std::string(1, static_cast<char>(c)) +
                                 "', using default: " + std::to_string(info.advance));
-                info.advance = static_cast<int>(fontSize / 2.0f);
+                info.advance = static_cast<int>(font->size / 2.0f);
             }
             if (w <= 0 || h <= 0)
             {
                 logger->warning("Invalid glyph dimensions for char '" + std::string(1, static_cast<char>(c)) +
                                 "', using default size");
-                w = static_cast<int>(fontSize / 2.0f);
-                h = static_cast<int>(fontSize);
+                w = static_cast<int>(font->size / 2.0f);
+                h = static_cast<int>(font->size);
                 info.x1 = info.x0 + w;
                 info.y1 = info.y0 + h;
             }
@@ -229,20 +274,31 @@ namespace AntColony::Render::GLFW
                 logger->error("Failed to generate glyph bitmap for character: " + std::to_string(c));
                 continue;
             }
-            for (int j = 0; j < h; j++)
-                for (int i = 0; i < w; i++)
-                    font->bitmap[(pos_y + j) * font->w + pos_x + i] = glyph_bitmap[j * w + i];
+
+            copyGlyphToBitmap(font, glyph_bitmap, pos_x, pos_y, w, h);
             stbtt_FreeBitmap(glyph_bitmap, nullptr);
+
             info.tex_x = pos_x;
             info.tex_y = pos_y;
             font->glyphCache[c] = info;
             pos_x += w + 1;
             max_height = std::max(max_height, h);
-            glyphCount++;
-            logger->debug("Glyph '" + std::string(1, static_cast<char>(c)) + "' advance=" + std::to_string(info.advance) +
-                          ", size=(" + std::to_string(w) + "," + std::to_string(h) + ")");
         }
+    }
 
+    void GLTextRenderer::copyGlyphToBitmap(std::shared_ptr<Text::Font> font, const unsigned char *glyph_bitmap, int pos_x, int pos_y, int w, int h)
+    {
+        for (int j = 0; j < h; j++)
+        {
+            for (int i = 0; i < w; i++)
+            {
+                font->bitmap[(pos_y + j) * font->w + pos_x + i] = glyph_bitmap[j * w + i];
+            }
+        }
+    }
+
+    bool GLTextRenderer::validateFontTexture(std::shared_ptr<Text::Font> font) const
+    {
         int nonZeroPixels = 0;
         for (int i = 0; i < font->w * font->h; i++)
         {
@@ -254,16 +310,20 @@ namespace AntColony::Render::GLFW
         {
             logger->error("Font texture is empty");
             delete[] font->bitmap;
-            return nullptr;
+            return false;
         }
+        return true;
+    }
 
-        logger->debug("Generating texture for font size: " + std::to_string(fontSize));
+    bool GLTextRenderer::createFontTexture(std::shared_ptr<Text::Font> font) const
+    {
+        logger->debug("Generating texture for font size: " + std::to_string(font->size));
         glGenTextures(1, &font->tex_id);
         if (font->tex_id == 0)
         {
             logger->error("Failed to generate texture ID for font");
             delete[] font->bitmap;
-            return nullptr;
+            return false;
         }
         glBindTexture(GL_TEXTURE_2D, font->tex_id);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -277,12 +337,10 @@ namespace AntColony::Render::GLFW
             logger->error("OpenGL error during texture upload: " + std::to_string(err));
             glDeleteTextures(1, &font->tex_id);
             delete[] font->bitmap;
-            return nullptr;
+            return false;
         }
         glBindTexture(GL_TEXTURE_2D, 0);
-
-        logger->debug("Font loaded successfully with size: " + std::to_string(fontSize));
-        return font;
+        return true;
     }
 
     void GLTextRenderer::drawTextCore(const std::shared_ptr<Text::Font> font, const char *text, float x, float y, float r, float g, float b, float winWidth, float winHeight) const
@@ -400,9 +458,9 @@ namespace AntColony::Render::GLFW
         glBindVertexArray(vao);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), reinterpret_cast<void *>(0));
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)(2 * sizeof(float)));
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), reinterpret_cast<void *>(2 * sizeof(float)));
         glEnableVertexAttribArray(1);
 
         glUseProgram(textShaderProgram);
