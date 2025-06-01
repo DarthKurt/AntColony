@@ -58,8 +58,7 @@ namespace AntColony::Simulation
 
     void Simulation::render(const Render::FrameContext &ctx) const
     {
-        auto rendererPtr = ctx.getRenderer();
-        auto &renderer = *rendererPtr.get();
+        const auto &renderer = *ctx.getRenderer().get();
 
         colony.render(renderer);
         antManager.render(renderer);

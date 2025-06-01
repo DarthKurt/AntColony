@@ -197,8 +197,6 @@ namespace AntColony::Render::GLFW
 
         for (auto c = SPACE_CHAR + 1; c < MAX_ACII_CODE; c++)
         {
-            if (c == TAB_CHAR || c == LINE_FEED_CHAR || c == RETURN_CHAR)
-                continue;
             Text::GlyphInfo info{};
             stbtt_GetCodepointHMetrics(&font->font, c, &info.advance, &info.lsb);
             stbtt_GetCodepointBitmapBox(&font->font, c, font->scale, font->scale, &info.x0, &info.y0, &info.x1, &info.y1);
