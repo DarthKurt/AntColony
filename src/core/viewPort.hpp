@@ -1,5 +1,5 @@
 #pragma once
-#include "point.hpp"
+#include "_fwd.hpp"
 
 namespace AntColony::Core
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "frameContext.hpp"
+#include "_fwd.hpp"
 #include <memory>
 
 namespace AntColony::Render

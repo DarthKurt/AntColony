@@ -1,5 +1,8 @@
 #include "pheromone.hpp"
 
+#include "../core/point.hpp"
+#include "../core/color.hpp"
+
 namespace AntColony::Simulation
 {
     Pheromone::Pheromone(PheromoneSignal signal, float size, int strength)

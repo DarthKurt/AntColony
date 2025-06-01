@@ -1,6 +1,6 @@
 #pragma once
 
-#include "renderer.hpp"
+#include "_fwd.hpp"
 #include <memory>
 
 namespace AntColony::Render
@@ -10,7 +10,7 @@ namespace AntColony::Render
     public:
         virtual void onBeforeRender() = 0;
         virtual void onAfterRender() = 0;
-        virtual const Renderer &getRenderer() const = 0;
+        virtual const std::shared_ptr<Renderer> getRenderer() const = 0;
         virtual ~FrameContext() {}
     };
 }

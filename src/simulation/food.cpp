@@ -1,5 +1,8 @@
 #include "food.hpp"
 
+#include "../core/point.hpp"
+#include "../core/color.hpp"
+
 namespace AntColony::Simulation
 {
     Food::Food(Core::Point position, float size, int capacity, std::function<void(Food*)> onEmpty)

@@ -1,5 +1,8 @@
 #include "counter.hpp"
 
+#include "../core/point.hpp"
+#include "../core/color.hpp"
+
 namespace AntColony::Simulation
 {
     Counter::Counter(Core::Point position, float size)

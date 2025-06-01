@@ -1,36 +1,70 @@
-#include <stb_truetype.h>
-#include <glad/glad.h>
+#pragma once
+
+#include "_fonts.hpp"
+
+#include "glyphInfo.hpp"
+#include <unordered_map>
 
 namespace AntColony::Render::GLFW::Text
 {
-    // Cache for common characters
-    struct GlyphInfo
-    {
-        int advance;        // Advance width
-        int lsb;            // Left side bearing
-        int x0, y0, x1, y1; // Bitmap box
-    };
-
+    /**
+     * @brief Structure to hold font data for text rendering.
+     */
     struct Font
     {
-        // Font resource data
-        unsigned char *bitmap; // Buffer for glyph bitmaps
-        int w, h;              // Bitmap dimensions (e.g., 512x512)
-        float size;            // Font size in pixels
-        stbtt_fontinfo font;   // stb_truetype font info
-        GLuint tex_id;         // OpenGL texture ID for glyphs
+        /// @brief Font size in pixels.
+        float size;
+        /// @brief Spacing between characters.
+        float spacing;
+        /// @brief Whether the font uses signed distance fields (SDF).
+        bool sdf;
+        /// @brief Scaling factor for font rendering.
+        float scale;
+        /// @brief Line height for the font.
+        float lineHeight;
+        /// @brief Font ascent (distance from baseline to top).
+        int ascent;
+        /// @brief Font descent (distance from baseline to bottom).
+        int descent;
+        /// @brief Line gap for the font.
+        int lineGap;
+        /// @brief OpenGL texture ID for the font atlas.
+        unsigned int tex_id;
+        /// @brief Width of the font atlas texture.
+        int w;
+        /// @brief Height of the font atlas texture.
+        int h;
+        /// @brief Bitmap data for the font atlas.
+        unsigned char *bitmap;
+        /// @brief STB TrueType font info.
+        stbtt_fontinfo font;
+        /// @brief Cache of glyph information, indexed by character code.
+        std::unordered_map<int, GlyphInfo> glyphCache;
 
-        // Font metrics
-        float scale;      // Scale for pixel height
-        int ascent;       // Font ascent (pixels above baseline)
-        int descent;      // Font descent (pixels below baseline)
-        int lineGap;      // Line gap between baselines
-        float lineHeight; // Total line height (ascent + descent + lineGap)
+        /**
+         * @brief Constructor initializes default values.
+         */
+        Font() : size(0.0f), spacing(0.0f), sdf(false), scale(0.0f), lineHeight(0.0f),
+                 ascent(0), descent(0), lineGap(0), tex_id(0), w(0), h(0), bitmap(nullptr) {}
 
-        // Rendering options
-        float spacing; // Additional character spacing
-        bool sdf;      // Whether this is a signed distance field font
+        /**
+         * @brief Destructor frees bitmap if allocated.
+         */
+        ~Font()
+        {
+            if (bitmap)
+            {
+                delete[] bitmap;
+                bitmap = nullptr;
+            }
+        }
 
-        GlyphInfo glyphCache[128]; // Cache for ASCII characters
+        // Disable copy to prevent double-free of bitmap
+        Font(const Font &) = delete;
+        Font &operator=(const Font &) = delete;
+
+        // Allow move for std::unique_ptr compatibility
+        Font(Font &&) = default;
+        Font &operator=(Font &&) = default;
     };
 }
