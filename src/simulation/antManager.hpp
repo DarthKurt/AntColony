@@ -154,5 +154,7 @@ namespace AntColony::Simulation
             const PheromoneSignal &pheromone,
             const float maxDetectionDistance,
             const int maxRealtiveStrength);
+
+        void onColonyCollision(AntColony::Simulation::Ant &ant, AntColony::Simulation::Counter &foodCounter);
     };
 }

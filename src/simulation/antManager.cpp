@@ -323,8 +323,7 @@ namespace AntColony::Simulation
                 // Check for colony collision (to drop food)
                 if (checkCollision(newPosition, colonyPosition, antSize, colonySize))
                 {
-                    ant.dropFood();
-                    foodCounter.increment();
+                    onColonyCollision(ant, foodCounter);
                 }
 
                 // Update position and return early
@@ -361,8 +360,7 @@ namespace AntColony::Simulation
                 // Check for colony interaction (to drop food)
                 if (checkCollision(newPosition, colonyPosition, antSize, colonySize))
                 {
-                    ant.dropFood();
-                    foodCounter.increment();
+                    onColonyCollision(ant, foodCounter);
                 }
 
                 // Update position and break out of retry loop
@@ -372,6 +370,15 @@ namespace AntColony::Simulation
         }
 
         return false;
+    }
+
+    void AntManager::onColonyCollision(Ant &ant, Counter &foodCounter)
+    {
+        if (ant.isBusy())
+        {
+            foodCounter.increment();
+        }
+        ant.dropFood();
     }
 
     std::stack<PheromoneSignal> AntManager::update(
