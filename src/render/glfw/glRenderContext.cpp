@@ -41,7 +41,7 @@ namespace AntColony::Render::GLFW
         logger->debug("GLFW initialized");
 
         const auto *title = "Ant Colony Simulation";
-        const auto windowWidth = 1280;
+        const auto windowWidth = 720;
         const auto windowHeight = 720;
 
         auto *w = glfwCreateWindow(windowWidth, windowHeight, title, NULL, NULL);
@@ -50,6 +50,9 @@ namespace AntColony::Render::GLFW
             logger->error("Failed to create GLFW window");
             glfwTerminate();
         }
+
+        // Enforce square zone
+        glfwSetWindowAspectRatio(w, 1, 1);
 
         logger->debug("GLFW Window (Title: '" +
                       std::string(title) + "', " +
