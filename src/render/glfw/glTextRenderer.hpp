@@ -7,6 +7,7 @@
 #include <string>
 #include "_gl.hpp"
 #include <unordered_map>
+#include <vector>
 
 namespace AntColony::Render::GLFW
 {
@@ -140,6 +141,60 @@ namespace AntColony::Render::GLFW
          */
         void drawTextCore(const std::shared_ptr<Text::Font> font, const char *text, float x, float y, float r, float g, float b, float winWidth, float winHeight) const;
 
-        static bool isSpecialChar(const char * c);
+        /**
+         * @brief Handles cursor positioning for special characters.
+         * @param font Font in use.
+         * @param c Character to handle.
+         * @param cursor_x Current X cursor position.
+         * @param cursor_y Current Y cursor position.
+         * @param x Original X position.
+         * @param fontScale Font scale factor.
+         * @param lineHeight Line height for newline.
+         */
+        void handleSpecialCharacter(
+            const std::shared_ptr<Text::Font> font,
+            char c,
+            float &cursor_x,
+            float &cursor_y,
+            float x,
+            float fontScale,
+            float lineHeight) const;
+
+        /**
+         * @brief Adds vertices for a regular character glyph.
+         * @param font Font in use.
+         * @param glyph Glyph information.
+         * @param cursor_x Current X cursor position.
+         * @param cursor_y Current Y cursor position.
+         * @param winHeight Window height for coordinate flipping.
+         * @param vertices Vector to add vertices to.
+         * @return True if successful, false otherwise.
+         */
+        bool tryAddGlyphVertices(
+            const std::shared_ptr<Text::Font> font,
+            const Text::GlyphInfo &glyph,
+            const float cursor_x,
+            const float cursor_y,
+            float winHeight,
+            std::vector<float> &vertices) const;
+
+        /**
+         * @brief Sets up OpenGL state for text rendering.
+         * @param boundTex Font texture id to bind.
+         */
+        static GLint setupTexture(const unsigned int &textId);
+
+        /**
+         * @brief Renders vertices using OpenGL.
+         * @param vertices Vertex data to render.
+         * @param r Red component of text color.
+         * @param g Green component of text color.
+         * @param b Blue component of text color.
+         * @param winWidth Window width for orthographic projection.
+         * @param winHeight Window height for orthographic projection.
+         */
+        void renderVertices(const std::vector<float> &vertices, float r, float g, float b, float winWidth, float winHeight) const;
+
+        static bool isSpecialChar(const char *c);
     };
 }

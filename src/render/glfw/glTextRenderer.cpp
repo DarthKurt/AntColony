@@ -350,108 +350,68 @@ namespace AntColony::Render::GLFW
             logger->error("Invalid font in drawTextCore");
             return;
         }
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, font->tex_id);
-        GLint boundTex;
-        glGetIntegerv(GL_TEXTURE_BINDING_2D, &boundTex);
+
+        const auto boundTex = setupTexture(font->tex_id);
         logger->debug("Bound texture ID: " + std::to_string(boundTex));
 
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
         std::vector<float> vertices;
-        auto cursor_x = x;
-        auto cursor_y = y; // Baseline of text
-
+        float cursor_x = x;
+        float cursor_y = y;
         int renderedGlyphs = 0;
+
         for (const char *c = text; *c; c++)
         {
-            if (font->glyphCache.find(*c) == font->glyphCache.end())
+            const auto it = font->glyphCache.find(*c);
+            if (it == font->glyphCache.end())
             {
                 logger->error("Glyph not found for character: " + std::string(1, *c));
                 continue;
             }
 
-            const auto &glyph = font->glyphCache.at(*c);
-            int w = glyph.x1 - glyph.x0, h = glyph.y1 - glyph.y0;
-
             if (isSpecialChar(c))
             {
-                switch (*c)
-                {
-                case SPACE_CHAR:
-                    cursor_x += static_cast<float>(glyph.advance) * font->scale;
-                    logger->debug("Space: advance=" + std::to_string(static_cast<float>(glyph.advance) * font->scale));
-                    break;
-                case TAB_CHAR:
-                    cursor_x += static_cast<float>(glyph.advance) * font->scale;
-                    logger->debug("Tab: advance=" + std::to_string(static_cast<float>(glyph.advance) * font->scale));
-                    break;
-                case LINE_FEED_CHAR:
-                    cursor_x = x;
-                    cursor_y += font->lineHeight;
-                    logger->debug("Line feed: cursor_y=" + std::to_string(cursor_y));
-                    break;
-                case RETURN_CHAR:
-                    cursor_x = x;
-                    logger->debug("Carriage return: cursor_x=" + std::to_string(cursor_x));
-                    break;
-                default:
-                    logger->debug("Skipping unprintable: ASCII " + std::to_string(static_cast<int>(*c)));
-                    break;
-                }
+                handleSpecialCharacter(font, *c, cursor_x, cursor_y, x, font->scale, font->lineHeight);
                 renderedGlyphs++;
                 continue;
             }
 
-            if (w <= 0 || h <= 0)
+            const auto &glyph = it->second;
+
+            if (tryAddGlyphVertices(font, glyph, cursor_x, cursor_y, winHeight, vertices))
             {
-                logger->error("Invalid glyph dimensions for character: " + std::string(1, *c));
-                cursor_x += static_cast<float>(glyph.advance) * font->scale;
-                continue;
+                renderedGlyphs++;
             }
-            float u0 = static_cast<float>(glyph.tex_x) / font->w;
-            float v0 = static_cast<float>(glyph.tex_y + h) / font->h; // Bottom of glyph
-            float u1 = static_cast<float>(glyph.tex_x + w) / font->w;
-            float v1 = static_cast<float>(glyph.tex_y) / font->h; // Top of glyph
-
-            // Position top of glyph above baseline
-            float posX = cursor_x;
-            float posY = cursor_y - font->ascent * font->scale + static_cast<float>(glyph.y0) * font->scale; // Top of glyph
-            float posX2 = posX + static_cast<float>(w);
-            float posY2 = posY + static_cast<float>(h);
-
-            // Flip y-coordinates to match viewport (y=0 at top)
-            float flippedPosY = winHeight - posY;
-            float flippedPosY2 = winHeight - posY2;
-
-            logger->debug("Glyph '" + std::string(1, *c) + "' quad: (" +
-                          std::to_string(posX) + ", " + std::to_string(flippedPosY2) + ") to (" +
-                          std::to_string(posX2) + ", " + std::to_string(flippedPosY) + "), tex: (" +
-                          std::to_string(u0) + "," + std::to_string(v0) + ") to (" +
-                          std::to_string(u1) + "," + std::to_string(v1) + ")");
-
-            // Define quad vertices: bottom-left, bottom-right, top-right, bottom-left, top-right, top-left
-            vertices.insert(vertices.end(), {posX, flippedPosY2, u0, v0});  // Bottom-left
-            vertices.insert(vertices.end(), {posX2, flippedPosY2, u1, v0}); // Bottom-right
-            vertices.insert(vertices.end(), {posX2, flippedPosY, u1, v1});  // Top-right
-            vertices.insert(vertices.end(), {posX, flippedPosY2, u0, v0});  // Bottom-left
-            vertices.insert(vertices.end(), {posX2, flippedPosY, u1, v1});  // Top-right
-            vertices.insert(vertices.end(), {posX, flippedPosY, u0, v1});   // Top-left
 
             cursor_x += static_cast<float>(glyph.advance) * font->scale;
-            renderedGlyphs++;
         }
+
         logger->debug("Prepared " + std::to_string(renderedGlyphs) + " glyphs for rendering");
 
         if (vertices.empty())
         {
-            logger->error("No valid glyphs to render");
+            logger->warning("No valid glyphs to render");
             glDisable(GL_BLEND);
             glBindTexture(GL_TEXTURE_2D, 0);
             return;
         }
 
+        renderVertices(vertices, r, g, b, winWidth, winHeight);
+        logger->debug("Text rendered: " + std::string(text));
+    }
+
+    GLint GLTextRenderer::setupTexture(const unsigned int &textId)
+    {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textId);
+        GLint boundTex;
+        glGetIntegerv(GL_TEXTURE_BINDING_2D, &boundTex);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        return boundTex;
+    }
+
+    void GLTextRenderer::renderVertices(const std::vector<float> &vertices, float r, float g, float b, float winWidth, float winHeight) const
+    {
         GLuint vao, vbo;
         glGenVertexArrays(1, &vao);
         glGenBuffers(1, &vbo);
@@ -462,21 +422,12 @@ namespace AntColony::Render::GLFW
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), reinterpret_cast<void *>(2 * sizeof(float)));
         glEnableVertexAttribArray(1);
-
         glUseProgram(textShaderProgram);
         glUniform1i(glGetUniformLocation(textShaderProgram, "uFontTex"), 0);
         glUniform3f(glGetUniformLocation(textShaderProgram, "uColor"), r, g, b);
         auto ortho = glm::ortho(0.0f, winWidth, 0.0f, winHeight);
         glUniformMatrix4fv(glGetUniformLocation(textShaderProgram, "uOrtho"), 1, GL_FALSE, &ortho[0][0]);
-
         glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(vertices.size() / 4));
-
-        GLenum err;
-        while ((err = glGetError()) != GL_NO_ERROR)
-        {
-            logger->error("OpenGL error during text rendering: " + std::to_string(err));
-        }
-
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
         glDeleteBuffers(1, &vbo);
@@ -484,6 +435,80 @@ namespace AntColony::Render::GLFW
         glDisable(GL_BLEND);
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        logger->debug("Text rendered: " + std::string(text));
+        GLenum err;
+        while ((err = glGetError()) != GL_NO_ERROR)
+        {
+            logger->error("OpenGL error during text rendering: " + std::to_string(err));
+        }
+    }
+
+    void GLTextRenderer::handleSpecialCharacter(const std::shared_ptr<Text::Font> font, char c, float &cursor_x, float &cursor_y, float x, float fontScale, float lineHeight) const
+    {
+        const auto &glyph = font->glyphCache.at(c);
+        switch (c)
+        {
+        case SPACE_CHAR:
+            cursor_x += static_cast<float>(glyph.advance) * fontScale;
+            logger->debug("Space: advance=" + std::to_string(static_cast<float>(glyph.advance) * fontScale));
+            break;
+        case TAB_CHAR:
+            cursor_x += static_cast<float>(glyph.advance) * fontScale;
+            logger->debug("Tab: advance=" + std::to_string(static_cast<float>(glyph.advance) * fontScale));
+            break;
+        case LINE_FEED_CHAR:
+            cursor_x = x;
+            cursor_y += lineHeight;
+            logger->debug("Line feed: cursor_y=" + std::to_string(cursor_y));
+            break;
+        case RETURN_CHAR:
+            cursor_x = x;
+            logger->debug("Carriage return: cursor_x=" + std::to_string(cursor_x));
+            break;
+        default:
+            logger->debug("Skipping unprintable: ASCII " + std::to_string(static_cast<int>(c)));
+            break;
+        }
+    }
+
+    bool GLTextRenderer::tryAddGlyphVertices(
+        const std::shared_ptr<Text::Font> font,
+        const Text::GlyphInfo &glyph,
+        const float cursor_x,
+        const float cursor_y,
+        float winHeight,
+        std::vector<float> &vertices) const
+    {
+
+        int w = glyph.x1 - glyph.x0;
+        int h = glyph.y1 - glyph.y0;
+
+        if (w <= 0 || h <= 0)
+            return false;
+
+        float posX = cursor_x;
+        float posY = cursor_y - font->ascent * font->scale + static_cast<float>(glyph.y0) * font->scale;
+
+        float u0 = static_cast<float>(glyph.tex_x) / font->w;
+        float v0 = static_cast<float>(glyph.tex_y + h) / font->h;
+        float u1 = static_cast<float>(glyph.tex_x + w) / font->w;
+        float v1 = static_cast<float>(glyph.tex_y) / font->h;
+        float posX2 = posX + static_cast<float>(w);
+        float posY2 = posY + static_cast<float>(h);
+        float flippedPosY = winHeight - posY;
+        float flippedPosY2 = winHeight - posY2;
+
+        logger->debug("Glyph quad: (" + std::to_string(posX) + ", " + std::to_string(flippedPosY2) + ") to (" +
+                      std::to_string(posX2) + ", " + std::to_string(flippedPosY) + "), tex: (" +
+                      std::to_string(u0) + "," + std::to_string(v0) + ") to (" +
+                      std::to_string(u1) + "," + std::to_string(v1) + ")");
+
+        vertices.insert(vertices.end(), {posX, flippedPosY2, u0, v0});
+        vertices.insert(vertices.end(), {posX2, flippedPosY2, u1, v0});
+        vertices.insert(vertices.end(), {posX2, flippedPosY, u1, v1});
+        vertices.insert(vertices.end(), {posX, flippedPosY2, u0, v0});
+        vertices.insert(vertices.end(), {posX2, flippedPosY, u1, v1});
+        vertices.insert(vertices.end(), {posX, flippedPosY, u0, v1});
+
+        return true;
     }
 }
