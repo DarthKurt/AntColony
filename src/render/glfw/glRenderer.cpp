@@ -100,56 +100,31 @@ namespace AntColony::Render::GLFW
             return;
         }
 
-        glUseProgram(figureShaderProgram);
         int winWidth, winHeight;
         glfwGetFramebufferSize(glfwGetCurrentContext(), &winWidth, &winHeight);
+
+        // Convert from normalized [-1,1] to pixel coordinates
+        float pixel_x = (position.x + 1.0f) * 0.5f * winWidth;
+        float pixel_y = (1.0f - position.y) * 0.5f * winHeight;
+
+        // Scale radius consistently with NDC space
+        // In NDC, the range is 2.0 (-1 to 1), so we multiply by the dimension/2
+        float pixel_radius = radius * (std::min(winWidth, winHeight) / 2.0f);
+
+        glUseProgram(figureShaderProgram);
         auto ortho = glm::ortho(0.0f, (float)winWidth, (float)winHeight, 0.0f);
         glUniformMatrix4fv(glGetUniformLocation(figureShaderProgram, "uOrtho"), 1, GL_FALSE, &ortho[0][0]);
         glUniform3f(glGetUniformLocation(figureShaderProgram, "uColor"), color.r, color.g, color.b);
+
+        // Position and scale the circle
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(pixel_x, pixel_y, 0.0f));
+        model = glm::scale(model, glm::vec3(pixel_radius, pixel_radius, 1.0f));
+        glUniformMatrix4fv(glGetUniformLocation(figureShaderProgram, "uModel"), 1, GL_FALSE, &model[0][0]);
 
         glBindVertexArray(circleVAO);
         glDrawArrays(GL_TRIANGLE_FAN, 0, NUM_CIRCLE_SEGMENTS + 2);
         glBindVertexArray(0);
-    }
-
-    void GLRenderer::drawFrame(const Core::Point &position, const float width, const float height, const Core::Color &color)
-    {
-        if (!isInited)
-        {
-            logger->error("Renderer not initialized, skipping drawFrame");
-            return;
-        }
-
-        float halfW = width / 2.0f;
-        float halfH = height / 2.0f;
-        float vertices[8] = {
-            position.x - halfW, position.y - halfH,
-            position.x + halfW, position.y - halfH,
-            position.x + halfW, position.y + halfH,
-            position.x - halfW, position.y + halfH};
-
-        GLuint vaoTmp, vboTmp;
-        glGenVertexArrays(1, &vaoTmp);
-        glGenBuffers(1, &vboTmp);
-        glBindVertexArray(vaoTmp);
-        glBindBuffer(GL_ARRAY_BUFFER, vboTmp);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
-        glEnableVertexAttribArray(0);
-
-        glUseProgram(figureShaderProgram);
-        int winWidth, winHeight;
-        glfwGetFramebufferSize(glfwGetCurrentContext(), &winWidth, &winHeight);
-        auto ortho = glm::ortho(0.0f, (float)winWidth, (float)winHeight, 0.0f);
-        glUniformMatrix4fv(glGetUniformLocation(figureShaderProgram, "uOrtho"), 1, GL_FALSE, &ortho[0][0]);
-        glUniform3f(glGetUniformLocation(figureShaderProgram, "uColor"), color.r, color.g, color.b);
-
-        glBindVertexArray(vaoTmp);
-        glDrawArrays(GL_LINE_LOOP, 0, 4);
-        glBindVertexArray(0);
-
-        glDeleteBuffers(1, &vboTmp);
-        glDeleteVertexArrays(1, &vaoTmp);
     }
 
     void GLRenderer::drawText(const Core::Point &position, const std::string &text, const Core::Color &color, const float fontSize)

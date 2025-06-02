@@ -43,15 +43,6 @@ namespace AntColony::Render::GLFW
         void drawCircleInPosition(const Core::Point &position, const float radius, const Core::Color &color) override;
 
         /**
-         * @brief Draws a rectangular frame at the specified position with given dimensions and color.
-         * @param position Center point of the frame.
-         * @param width Width of the frame.
-         * @param height Height of the frame.
-         * @param color RGB color of the frame.
-         */
-        void drawFrame(const Core::Point &position, const float width, const float height, const Core::Color &color) override;
-
-        /**
          * @brief Draws text at the specified position with given color.
          * @param position Top-left position for text rendering.
          * @param text String to render.

@@ -91,22 +91,26 @@ namespace AntColony::Render::GLFW
             return;
         }
 
-        // Get or load font for the requested size
-        auto it = fontCache.find(fontSize);
-        if (it == fontCache.end())
-        {
-            auto font = loadFont(fontSize);
-            if (!font)
-            {
-                logger->error("Failed to load font size: " + std::to_string(fontSize));
-                return;
-            }
-            it = fontCache.emplace(fontSize, font).first;
-            logger->debug("Loaded new font size: " + std::to_string(fontSize));
-        }
-
         int winWidth, winHeight;
         glfwGetFramebufferSize(glfwGetCurrentContext(), &winWidth, &winHeight);
+        
+        // Convert NDC font size to pixels
+        // Using the smaller dimension to ensure text is proportional regardless of window aspect ratio
+        float pixelFontSize = fontSize * (winWidth < winHeight ? winWidth : winHeight) * 0.5f;
+
+        // Get or load font for the requested size
+        auto it = fontCache.find(pixelFontSize);
+        if (it == fontCache.end())
+        {
+            auto font = loadFont(pixelFontSize);
+            if (!font)
+            {
+                logger->error("Failed to load font size: " + std::to_string(pixelFontSize));
+                return;
+            }
+            it = fontCache.emplace(pixelFontSize, font).first;
+            logger->debug("Loaded new font size: " + std::to_string(pixelFontSize));
+        }
 
         float pixel_x = (position.x + 1.0f) * 0.5f * winWidth;
         float pixel_y = (1.0f - position.y) * 0.5f * winHeight;

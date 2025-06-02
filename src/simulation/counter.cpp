@@ -10,19 +10,8 @@ namespace AntColony::Simulation
 
     void Counter::render(Render::Renderer &renderer)
     {
-
         auto countText = "Food: " + std::to_string(counter);
-    
-        // Calculate frame dimensions based on text length
-        // Assuming average character width is 1/4 of size        
-        auto charWidth = entitySize / 4.0f;
-        auto padding = 0.01f;
-    
-        auto length = countText.length() * charWidth + padding;
-    
-        // Draw a frame and text
-        renderer.drawFrame(position, length, entitySize, Core::Color(mainColor));
-        renderer.drawText(position, countText, Core::Color(mainColor), 16);
+        renderer.drawText(position, countText, Core::Color(mainColor), entitySize);
     }
 
     void Counter::increment(int count)
