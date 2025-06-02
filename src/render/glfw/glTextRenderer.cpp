@@ -107,7 +107,11 @@ namespace AntColony::Render::GLFW
 
         int winWidth, winHeight;
         glfwGetFramebufferSize(glfwGetCurrentContext(), &winWidth, &winHeight);
-        drawTextCore(it->second, text.c_str(), position.x, position.y, color.r, color.g, color.b, static_cast<float>(winWidth), static_cast<float>(winHeight));
+
+        float pixel_x = (position.x + 1.0f) * 0.5f * winWidth;
+        float pixel_y = (1.0f - position.y) * 0.5f * winHeight;
+
+        drawTextCore(it->second, text.c_str(), pixel_x, pixel_y, color.r, color.g, color.b, static_cast<float>(winWidth), static_cast<float>(winHeight));
     }
 
     std::shared_ptr<Text::Font> GLTextRenderer::loadFont(float fontSize) const
@@ -486,7 +490,7 @@ namespace AntColony::Render::GLFW
             return false;
 
         float posX = cursor_x;
-        float posY = cursor_y - font->ascent * font->scale + static_cast<float>(glyph.y0) * font->scale;
+        float posY = cursor_y - font->ascent * font->scale + static_cast<float>(glyph.y0);
 
         float u0 = static_cast<float>(glyph.tex_x) / font->w;
         float v0 = static_cast<float>(glyph.tex_y + h) / font->h;
