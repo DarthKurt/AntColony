@@ -15,7 +15,7 @@ namespace AntColony::Simulation
             strength -= 1;
     }
 
-    void Pheromone::render(const Render::Renderer &renderer) const
+    void Pheromone::render(Render::Renderer &renderer)
     {
         renderer.drawCircleInPosition(position, entitySize, Core::Color(mainColor));
     }

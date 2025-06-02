@@ -17,7 +17,7 @@ namespace AntColony::Simulation
         Ant(Core::Point position, float size, int pheromoneThreshold);
         Ant(Core::Point position, Core::Point velocity, float size, int pheromoneThreshold);
 
-        void render(const Render::Renderer &renderer) const override;
+        void render(Render::Renderer &renderer) override;
 
         void biteFood(std::shared_ptr<Food> food);
         void dropFood();

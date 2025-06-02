@@ -74,7 +74,7 @@ namespace AntColony::Simulation
         return PheromoneSignal(spawnPosition, pheromoneExcitement--);
     }
 
-    void Ant::render(const Render::Renderer &renderer) const
+    void Ant::render(Render::Renderer &renderer)
     {
         if (carryFood)
         {

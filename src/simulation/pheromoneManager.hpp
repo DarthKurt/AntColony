@@ -21,7 +21,7 @@ namespace AntColony::Simulation
         explicit PheromoneManager(std::shared_ptr<Core::Logger> logger, float pheromoneSize);
 
         void update(const std::stack<PheromoneSignal> &signals);
-        void render(const Render::Renderer &renderer) const;
+        void render(Render::Renderer &renderer) const;
 
         const std::vector<PheromoneSignal> getPheromones() const;
 

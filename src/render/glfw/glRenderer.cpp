@@ -4,6 +4,7 @@
 #include "glShaders.hpp"
 #include "glRenderer.hpp"
 #include "glShaderProvider.hpp"
+#include "glTextRenderer.hpp"
 
 #include "../../core/logger.hpp"
 #include "../../core/point.hpp"
@@ -20,7 +21,10 @@ namespace AntColony::Render::GLFW
     constexpr const int NUM_CIRCLE_SEGMENTS = 50;
 
     GLRenderer::GLRenderer(const std::shared_ptr<GLShaderProvider> shaderProvider, const std::shared_ptr<AntColony::Core::Logger> logger)
-        : shaderProvider(shaderProvider), logger(logger), isInited(false) {}
+        : shaderProvider(shaderProvider),
+          logger(logger),
+          textRenderer(std::make_shared<GLTextRenderer>(shaderProvider, logger)),
+          isInited(false) {}
 
     GLRenderer::~GLRenderer()
     {
@@ -49,6 +53,7 @@ namespace AntColony::Render::GLFW
         }
 
         initCircleGeometry();
+        textRenderer->init();
         isInited = true;
 
         // Log viewport
@@ -87,7 +92,7 @@ namespace AntColony::Render::GLFW
         glBindVertexArray(0);
     }
 
-    void GLRenderer::drawCircleInPosition(const Core::Point &position, const float radius, const Core::Color &color) const
+    void GLRenderer::drawCircleInPosition(const Core::Point &position, const float radius, const Core::Color &color)
     {
         if (!isInited)
         {
@@ -107,7 +112,7 @@ namespace AntColony::Render::GLFW
         glBindVertexArray(0);
     }
 
-    void GLRenderer::drawFrame(const Core::Point &position, const float width, const float height, const Core::Color &color) const
+    void GLRenderer::drawFrame(const Core::Point &position, const float width, const float height, const Core::Color &color)
     {
         if (!isInited)
         {
@@ -147,12 +152,14 @@ namespace AntColony::Render::GLFW
         glDeleteVertexArrays(1, &vaoTmp);
     }
 
-    void GLRenderer::drawText(const Core::Point &position, const std::string &text, const Core::Color &color) const
+    void GLRenderer::drawText(const Core::Point &position, const std::string &text, const Core::Color &color, const float fontSize)
     {
         if (!isInited)
         {
             logger->error("Renderer not initialized, skipping drawText");
             return;
         }
+
+        textRenderer->drawText(position, text, color, fontSize);
     }
 }

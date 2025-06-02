@@ -13,7 +13,7 @@ namespace AntColony::Simulation
     public:
         Pheromone(PheromoneSignal signal, float size, int strength);
 
-        void render(const Render::Renderer &renderer) const override;
+        void render(Render::Renderer &renderer) override;
         void evaporate();
 
         int getStrength() const;

@@ -17,7 +17,7 @@ namespace AntColony::Simulation
             onEmpty(this);
     }
 
-    void Food::render(const Render::Renderer &renderer) const
+    void Food::render(Render::Renderer &renderer)
     {
         renderer.drawCircleInPosition(position, entitySize * capacity, Core::Color(mainColor));
     }

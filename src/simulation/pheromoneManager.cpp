@@ -30,7 +30,7 @@ namespace AntColony::Simulation
         depositPheromones(signals);
     }
 
-    void PheromoneManager::render(const Render::Renderer &renderer) const
+    void PheromoneManager::render(Render::Renderer &renderer) const
     {
         for (const auto &[ptr, pheromone] : pheromones)
         {
