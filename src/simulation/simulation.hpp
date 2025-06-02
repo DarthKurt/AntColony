@@ -25,7 +25,7 @@ namespace AntColony::Simulation
         explicit Simulation(std::shared_ptr<Core::Logger> logger);
 
         void update(const Render::FrameContext &ctx);
-        void render(const Render::FrameContext &ctx) const;
+        void render(const Render::FrameContext &ctx);
 
     private:
         Simulation(

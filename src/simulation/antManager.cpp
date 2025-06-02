@@ -410,9 +410,9 @@ namespace AntColony::Simulation
         return outcomingSignals;
     }
 
-    void AntManager::render(const Render::Renderer &renderer) const
+    void AntManager::render(Render::Renderer &renderer)
     {
-        for (const auto &ant : ants)
+        for (auto &ant : ants)
             ant.render(renderer);
     }
 

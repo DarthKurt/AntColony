@@ -56,9 +56,9 @@ namespace AntColony::Simulation
         foodManager.update();
     }
 
-    void Simulation::render(const Render::FrameContext &ctx) const
+    void Simulation::render(const Render::FrameContext &ctx)
     {
-        const auto &renderer = *ctx.getRenderer().get();
+        auto &renderer = *ctx.getRenderer().get();
 
         colony.render(renderer);
         antManager.render(renderer);

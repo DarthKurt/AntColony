@@ -1,35 +1,93 @@
-// #include "simulation/simulation.hpp"
-// #include "render/render.hpp"
-// #include "render/renderEngines.hpp"
-// #include "utils/randomGenerator.hpp"
+// #include "render/glfw/glTextRenderer.hpp"
+// #include "render/glfw/glShaderProvider.hpp"
+// #include "core/logger.hpp"
+// #include "core/point.hpp"
+// #include "core/color.hpp"
 // #include "utils/consoleLogger.hpp"
 
-// #include "memory"
+// #include <memory>
+// #include <iostream>
+// #include <thread>
+// #include <chrono>
 
+// constexpr auto FRAME_RATE = 1000.0f / 0.5f;
+
+// /**
+//  * @brief Main function to test text rendering with GLRenderer.
+//  * @return int Program exit code (0 for success, 1 for failure).
+//  */
 // int main()
 // {
-//     const auto logger = std::make_shared<AntColony::Utils::ConsoleLogger>();
-//     auto renderCtx = AntColony::Render::initRenderContext(AntColony::Render::OPENGL, logger);
-
-//     if (!renderCtx->getInited())
-//         return -1;
-
-//     // Initialize the random generator with time-based seed
-//     AntColony::Utils::RandomGenerator::getInstance().seed();
-
-//     AntColony::Simulation::Simulation simulation(logger);
-
-//     while (!renderCtx->shouldClose())
+//     // Initialize GLFW
+//     if (!glfwInit())
 //     {
-//         auto frameCtx = renderCtx->getFrameContext();
-
-//         frameCtx->onBeforeRender();
-
-//         simulation.update(*frameCtx);
-//         simulation.render(*frameCtx);
-
-//         frameCtx->onAfterRender();
+//         std::cerr << "Failed to initialize GLFW\n";
+//         return 1;
 //     }
 
+//     // Set OpenGL version to 3.3 core profile
+//     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+//     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+//     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+//     // Create a window
+//     GLFWwindow *window = glfwCreateWindow(1280, 720, "Text Rendering Test", nullptr, nullptr);
+//     if (!window)
+//     {
+//         std::cerr << "Failed to create GLFW window\n";
+//         glfwTerminate();
+//         return 1;
+//     }
+
+//     // Make the window's context current
+//     glfwMakeContextCurrent(window);
+
+//     // Initialize GLAD
+//     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+//     {
+//         std::cerr << "Failed to initialize GLAD\n";
+//         glfwDestroyWindow(window);
+//         glfwTerminate();
+//         return 1;
+//     }
+
+//     // Set up viewport
+//     glViewport(0, 0, 1280, 720);
+
+//     // Create logger and shader provider
+//     auto logger = std::make_shared<AntColony::Utils::ConsoleLogger>();
+//     auto shaderProvider = std::make_shared<AntColony::Render::GLFW::GLShaderProvider>(logger);
+
+//     // Create renderer
+//     auto renderer = std::make_shared<AntColony::Render::GLFW::GLTextRenderer>(shaderProvider, logger);
+//     renderer->init();
+
+//     // Main loop
+//     while (!glfwWindowShouldClose(window))
+//     {
+//         const auto startTime = std::chrono::steady_clock::now();
+
+//         // Clear the screen
+//         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+//         glClear(GL_COLOR_BUFFER_BIT);
+
+//         // Render text at position (100, 100) with white color
+//         renderer->drawText(AntColony::Core::Point{-0.5f, -0.5f}, "Hello, World!\n\tIt's a beautiful day!\nLorem ipsum - @#$%^&*()_+=;{}<>/?", AntColony::Core::Color(0x7d4827), 32.0f);
+
+//         // Swap buffers and poll events
+//         glfwSwapBuffers(window);
+//         glfwPollEvents();
+
+//         auto endTime = std::chrono::steady_clock::now();
+//         auto frameDuration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
+//         if (frameDuration.count() < FRAME_RATE)
+//         {
+//             std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(FRAME_RATE - frameDuration.count())));
+//         }
+//     }
+
+//     // Clean up
+//     glfwDestroyWindow(window);
+//     glfwTerminate();
 //     return 0;
 // }

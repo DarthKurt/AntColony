@@ -12,7 +12,7 @@ namespace AntColony::Simulation
         Colony(Core::Point position, float size);
         Colony(Core::Point position, float size, unsigned int hexColor);
 
-        void render(const Render::Renderer &renderer) const override;
+        void render(Render::Renderer &renderer) override;
 
         Core::Point getPosition() const override;
         float getSize() const override;

@@ -95,7 +95,7 @@ namespace AntColony::Simulation
             spawnFood();
     }
 
-    void FoodManager::render(const Render::Renderer &renderer) const
+    void FoodManager::render(Render::Renderer &renderer) const
     {
         for (const auto &[ptr, food] : foodParticles)
         {

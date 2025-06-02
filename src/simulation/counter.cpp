@@ -8,7 +8,7 @@ namespace AntColony::Simulation
     Counter::Counter(Core::Point position, float size)
         : BaseEntity(position, 0x7d4827, size), counter(0) {}
 
-    void Counter::render(const Render::Renderer &renderer) const
+    void Counter::render(Render::Renderer &renderer)
     {
 
         auto countText = "Food: " + std::to_string(counter);
@@ -22,7 +22,7 @@ namespace AntColony::Simulation
     
         // Draw a frame and text
         renderer.drawFrame(position, length, entitySize, Core::Color(mainColor));
-        renderer.drawText(position, countText, Core::Color(mainColor));
+        renderer.drawText(position, countText, Core::Color(mainColor), 16);
     }
 
     void Counter::increment(int count)

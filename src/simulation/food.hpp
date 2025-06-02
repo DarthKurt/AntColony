@@ -15,7 +15,7 @@ namespace AntColony::Simulation
         Food(Core::Point position, float size, int capacity, std::function<void(Food*)> onEmpty);
 
         void take();
-        void render(const Render::Renderer &renderer) const override;
+        void render(Render::Renderer &renderer) override;
 
         int getCapacity() const;
         Core::Point getPosition() const override;

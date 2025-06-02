@@ -60,7 +60,7 @@ namespace AntColony::Simulation
          * @brief Renders all ants to the window
          * @param renderer The renderer to be used
          */
-        void render(const Render::Renderer &renderer) const;
+        void render(Render::Renderer &renderer);
 
     private:
         /**

@@ -15,7 +15,7 @@ namespace AntColony::Simulation
         void increment(int count);
         void increment();
 
-        void render(const Render::Renderer &renderer) const override;
+        void render(Render::Renderer &renderer) override;
 
         Core::Point getPosition() const override;
         float getSize() const override;

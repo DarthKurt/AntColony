@@ -40,7 +40,7 @@ namespace AntColony::Render::GLFW
          * @param radius Radius of the circle.
          * @param color RGB color of the circle.
          */
-        void drawCircleInPosition(const Core::Point &position, const float radius, const Core::Color &color) const override;
+        void drawCircleInPosition(const Core::Point &position, const float radius, const Core::Color &color) override;
 
         /**
          * @brief Draws a rectangular frame at the specified position with given dimensions and color.
@@ -49,21 +49,24 @@ namespace AntColony::Render::GLFW
          * @param height Height of the frame.
          * @param color RGB color of the frame.
          */
-        void drawFrame(const Core::Point &position, const float width, const float height, const Core::Color &color) const override;
+        void drawFrame(const Core::Point &position, const float width, const float height, const Core::Color &color) override;
 
         /**
          * @brief Draws text at the specified position with given color.
          * @param position Top-left position for text rendering.
          * @param text String to render.
          * @param color RGB color of the text.
+         * @param fontSize Size of the font.
          */
-        void drawText(const Core::Point &position, const std::string &text, const Core::Color &color) const override;
+        void drawText(const Core::Point &position, const std::string &text, const Core::Color &color, const float fontSize) override;
 
     private:
         /// @brief Shared pointer to the shader provider.
         const std::shared_ptr<GLShaderProvider> shaderProvider;
         /// @brief Shared pointer to the logger for error reporting.
         const std::shared_ptr<AntColony::Core::Logger> logger;
+        /// @brief Shared pointer to the text renderer.
+        const std::shared_ptr<GLTextRenderer> textRenderer;
         /// @brief Shader program for rendering shapes (circles, frames).
         GLuint figureShaderProgram;
         /// @brief Shader program for rendering text.

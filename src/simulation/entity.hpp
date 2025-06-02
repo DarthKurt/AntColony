@@ -11,7 +11,7 @@ namespace AntColony::Simulation
         /**
          * @brief Method for rendering the entity
          */
-        virtual void render(const Render::Renderer &renderer) const = 0;
+        virtual void render(Render::Renderer &renderer) = 0;
 
         virtual Core::Point getPosition() const = 0;
         virtual float getSize() const = 0;

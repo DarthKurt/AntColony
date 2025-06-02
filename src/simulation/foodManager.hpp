@@ -18,7 +18,7 @@ namespace AntColony::Simulation
         FoodManager(Core::Point colonyCenter, float colonyRadius, float foodRadius, Core::ViewPort viewPort);
 
         void update();
-        void render(const Render::Renderer &renderer) const;
+        void render(Render::Renderer &renderer) const;
 
         std::vector<std::shared_ptr<Food>> getFoodParticles() const;
 
